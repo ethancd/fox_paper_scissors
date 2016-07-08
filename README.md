@@ -1,2 +1,2 @@
-# bulbcharsquirt
-Command line version of abstract board game Bulbasaur-Charmander-Squirtle (featuring AI)
+# Fox Paper Scissors
+Ruby-on-Rails version of abstract board game Fox Paper Scissors, built with websockets and React
