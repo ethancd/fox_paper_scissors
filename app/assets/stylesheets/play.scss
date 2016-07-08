@@ -1,0 +1,70 @@
+$board-color: #000;
+$board-active-color: #f00;
+$board-text-color: #fff;
+
+$timer-color: #bbb;
+$timer-text-color: #080;
+
+$chat-color: #add8e6;
+$chat-messages-color: desaturate(lighten($chat-color, 20%), 20%);
+
+
+.play-area {
+  width: 750px;
+  height: 500px;
+  margin: 50px auto;
+
+  div {
+    float: left;
+    margin-left: 25px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.timer {
+  width: calc(20% - 25px);
+  height: 100%;
+  color: $timer-text-color;
+  background-color: $timer-color;
+}
+
+.board {
+  width: calc(60%);
+  height: 100%;
+  color: $board-text-color;
+  background-color: $board-color;
+
+  &.active {
+    background-color: $board-active-color;
+  }
+}
+
+.chat {
+  width: calc(20% - 25px);
+  height: 100%;
+  background-color: $chat-color;
+  font-size: 16px;
+
+  .messages {
+    height: 80%;
+    margin: 2px;
+    background-color: $chat-messages-color;
+  }
+
+  input {
+    width: calc(100% - 10px);
+    height: 32px;
+    margin: 5px;
+    padding: 0;
+    border: 0;
+    background-color: $chat-messages-color;
+  }
+
+  button {
+    background-color: orange;
+    float: right;
+  }
+}
