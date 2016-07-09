@@ -45,7 +45,7 @@ $chat-text-color: #333;
 
     height: 52px;
     margin-top: 14px;
-    overflow: auto;
+    overflow: visible;
 
     &.long {
       width: 100%;
@@ -77,13 +77,14 @@ $chat-text-color: #333;
     border-radius: 50%;
     border: 1px solid #000;
     margin-left: 50px;
+    overflow: visible;
 
     &:first-child {
       margin-left: 0;
     }
 
     &.highlighted {
-      border-color: #ffd700;
+      box-shadow: 0 0 20px #ffd700;
     }
   }
 
@@ -97,7 +98,7 @@ $chat-text-color: #333;
     background-size: contain;
 
     &.highlighted {
-      border-color: #0f0;
+      box-shadow: 0 0 20px #0f0;
     }
 
     &.red {

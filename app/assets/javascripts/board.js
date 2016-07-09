@@ -8,15 +8,33 @@ var Board = function(){
 
     $('.node').on('click', function () {
       if($(this).hasClass("highlighted")) {
-        $('.piece').add('.node').removeClass("highlighted");
+        $('.node').removeClass("highlighted");
         BoardListener.send("node.clicked", { node: $(this)});
       }
     });
   };
 
   this.highlightLegalSquares = function(data) {
-    $('.node').addClass("highlighted");
+    $('.node').removeClass("highlighted");
+
+    if(!data.active) {
+      return;
+    }
+
+    $('.node:empty').each(function(i, el) {
+      var coords = $(el).attr("id").match(/\d/g);
+      var adjacent = this.isAdjacent(coords, data.position);
+
+      if(adjacent) {
+        $(el).addClass("highlighted");
+      }
+    }.bind(this));
+
   };
+
+  this.isAdjacent = function(pos1, pos2) {
+    return 2 == (Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]))
+  }
 };
 
 

@@ -2,9 +2,10 @@
   <% even = i%2 == 0  %>
 
   <div class="row <%= even ? 'long' : 'short' %>">
-    <% (even ? 4 : 3).times do |j| %>
+    <% 7.times do |j| %>
+      <% next unless i % 2 == j % 2 %>
       <% id = "x-#{j}-y-#{i}" %>
-      <div class="node" id="id"></div>
+      <div class="node" id="<%= id %>"></div>
     <% end %>
 
   </div>
