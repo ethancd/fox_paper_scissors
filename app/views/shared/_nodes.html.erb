@@ -1,0 +1,11 @@
+<% 7.times do |i| %>
+  <% even = i%2 == 0  %>
+
+  <div class="row <%= even ? 'long' : 'short' %>">
+    <% (even ? 4 : 3).times do |j| %>
+      <% id = "x-#{j}-y-#{i}" %>
+      <div class="node" id="id"></div>
+    <% end %>
+
+  </div>
+<% end %>

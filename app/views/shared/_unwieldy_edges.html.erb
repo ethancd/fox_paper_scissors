@@ -1,0 +1,14 @@
+<% ["horizontal", "vertical"].each do |angle| %>
+  <% 7.times do |i| %>
+    <% even = i%2 == 0  %>
+    <% (even ? 4 : 3).times do %>
+      <div class="edge <%= angle %> <%= even ? 'long' : 'short' %>"></div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% ["asc", "desc"].each do |angle| %>
+  <% ["short", "medium", "long", "medium", "short"].each do |length| %>
+    <div class="edge <%= angle %> <%= length %>"></div>
+  <% end %>
+<% end %>

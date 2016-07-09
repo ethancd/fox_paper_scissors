@@ -7,14 +7,14 @@ $timer-text-color: #080;
 
 $chat-color: #add8e6;
 $chat-messages-color: desaturate(lighten($chat-color, 20%), 20%);
-
+$chat-text-color: #333;
 
 .play-area {
   width: 750px;
-  height: 500px;
+  height: 450px;
   margin: 50px auto;
 
-  div {
+  & > div {
     float: left;
     margin-left: 25px;
 
@@ -32,13 +32,93 @@ $chat-messages-color: desaturate(lighten($chat-color, 20%), 20%);
 }
 
 .board {
+  position: relative;
   width: calc(60%);
   height: 100%;
   color: $board-text-color;
-  background-color: $board-color;
+  background-image: url(image_path('line_grid.png'));
+  background-size: contain;
 
-  &.active {
-    background-color: $board-active-color;
+  .row {
+    display: flex;
+    justify-content: space-between;
+
+    height: 52px;
+    margin-top: 14px;
+    overflow: auto;
+
+    &.long {
+      width: 100%;
+
+      .node {
+        background-color: #ccc;
+      }
+    }
+
+    &.short {
+      width: 70%;
+      margin-right: auto;
+      margin-left: auto;
+
+      .node {
+        background-color: #777;
+      }
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .node {
+    height: 50px;
+    width: 50px;
+    float: left;
+    border-radius: 50%;
+    border: 1px solid #000;
+    margin-left: 50px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &.highlighted {
+      border-color: #ffd700;
+    }
+  }
+
+  .piece {
+    position: absolute;
+    z-index: 2;
+    height: 50px;
+    width: 50px;
+    border: 1px solid #000;
+    border-radius: 50%;
+    background-size: contain;
+
+    &.highlighted {
+      border-color: #0f0;
+    }
+
+    &.red {
+      background-color: red;
+    }
+
+    &.blue {
+      background-color: blue;
+    }
+
+    &.rock {
+      background-image: url(image_path('rock.png'));
+    }
+
+    &.paper {
+      background-image: url(image_path('paper.png'));
+    }
+
+    &.scissors {
+      background-image: url(image_path('scissors.png'));
+    }
   }
 }
 
@@ -52,9 +132,15 @@ $chat-messages-color: desaturate(lighten($chat-color, 20%), 20%);
     height: 80%;
     margin: 2px;
     background-color: $chat-messages-color;
+
+    .message {
+      width: 100%;
+      margin: 1px;
+      color: $chat-text-color;
+    }
   }
 
-  input {
+  textarea {
     width: calc(100% - 10px);
     height: 32px;
     margin: 5px;

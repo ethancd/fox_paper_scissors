@@ -3,4 +3,6 @@ Rails.application.routes.draw do
   root 'splash#index'
 
   get ':controller(/:action(/:id))'
+
+  match 'chat', to: 'chat#respond', via: [:post]
 end
