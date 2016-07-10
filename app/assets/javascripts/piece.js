@@ -1,19 +1,29 @@
 var Piece = function(color, type, position){
   this.initialize = function() {
     this.$el = $("." + color + "." + type);
+
+    this.color = color;
+
+    this.originalPosition = position;
     this.position = position;
+
     this.moveToPosition();
     this.attachHandlers();
   };
 
   this.attachHandlers = function() {
     BoardListener.listen("node.clicked", this.movePiece.bind(this));
+    BoardListener.listen("reset", this.resetPiece.bind(this));
 
     this.$el.on('click', this.highlight.bind(this));
   };
 
   this.highlight = function(event) {
     var el = event.currentTarget;
+
+    if (!this.matchesTurnColor($(el), $('.turn-tracker'))) {
+      return;
+    }
     //validate your own pieces are the one you're clicking
     $(el).toggleClass("highlighted")
     $('.piece').not(el).removeClass("highlighted");
@@ -28,9 +38,10 @@ var Piece = function(color, type, position){
     if (!this.$el.hasClass("highlighted")) {
       return;
     }
-    
+
     this.position = data.node.attr("id").match(/\d/g);
     this.moveToPosition();
+    BoardListener.send("piece.moved", {color: this.color});
 
     this.$el.removeClass("highlighted")
   };
@@ -54,6 +65,20 @@ var Piece = function(color, type, position){
 
     return true;
   };
+
+  this.resetPiece = function() {
+    this.position = this.originalPosition;
+    this.moveToPosition();
+  };
+
+  this.matchesTurnColor = function(piece, tracker) {
+    var colors = ["red", "blue"];
+    for (var i = 0; i < colors.length; i++) {
+      if (piece.hasClass(color) && tracker.hasClass(color)) {
+        return true;
+      }
+    }
+  }
 };
 
 var generatePieces = function() {

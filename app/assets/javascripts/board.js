@@ -12,6 +12,10 @@ var Board = function(){
         BoardListener.send("node.clicked", { node: $(this)});
       }
     });
+
+    $('button.reset').on('click', function() {
+      BoardListener.send("reset")
+    });
   };
 
   this.highlightLegalSquares = function(data) {
