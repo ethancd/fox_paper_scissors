@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   get ':controller(/:action(/:id))'
 
   match 'chat', to: 'chat#respond', via: [:post]
+  match 'play/move', to: 'play#send_move', via: [:post]
 end
