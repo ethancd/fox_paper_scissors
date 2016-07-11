@@ -3,7 +3,7 @@ require_relative 'evaluated_move'
 
 class AI
 
-  def initialize(options)
+  def initialize(options = {})
     @random = options[:random] || false
   end
 
@@ -24,7 +24,7 @@ class AI
     deepest_move = possible_moves.sample.causal_move
 
     begin
-      require_relative "timeout"
+      require "timeout"
       Timeout::timeout(15) do
         loop do
           evaluated_move = find_move(possible_moves, side, depth)
@@ -86,7 +86,7 @@ class AI
 
   def find_minimax_move(possible_moves, side, depth)
     possible_moves.max_by do |child| 
-      child.simple_score_node(side, depth)
+      child.simple_score_node(side)
     end
   end
 

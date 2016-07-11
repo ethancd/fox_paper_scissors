@@ -35,7 +35,7 @@ class PlayController < ApplicationController
     victory = board.is_winning_move?(move);
 
     if valid && !victory #&& ai
-      @ai = AI.new({random: true})
+      @ai = AI.new
       next_board = board.get_board_state_after_move(move)
       next_color = move.piece.color == "red" ? "blue" : "red"
       next_move = @ai.move(next_board, next_color)

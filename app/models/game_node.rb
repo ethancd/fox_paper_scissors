@@ -160,12 +160,19 @@ class GameNode
   #   return self.next_mover_side == evaluator ? value : 1 - value
   # end
 
-  def score_node(evaluator, depth)
-    
+  # def score_node(evaluator, depth)
+  #   return nil if depth <= 0 
+  # end
+
+  def simple_score_node(side)
+    our_moves = @board.legal_moves(side).length
+    their_moves = @board.legal_moves(other_side(side)).length
+
+    get_weighted_score(our_moves, their_moves)
   end
 
-  def simple_score_node
-    @board.legal_moves(@next_mover_side).length
+  def get_weighted_score(our_moves, their_moves)
+    Math.log(our_moves, 2) - Math.log(their_moves, 2)
   end
 
   # This method generates an array of all moves that can be made after
@@ -175,10 +182,14 @@ class GameNode
 
     board.legal_moves(self.next_mover_side).each do |move|
       new_board = board.get_board_state_after_move(move)
-      next_mover_side = (self.next_mover_side == "red" ? "blue" : "red")
+      next_mover_side = other_side(self.next_mover_side)
       children << GameNode.new(new_board, next_mover_side, move)
     end
 
     children
+  end
+
+  def other_side(side)
+    side == "red" ? "blue" : "red"
   end
 end
