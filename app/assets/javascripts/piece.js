@@ -21,19 +21,17 @@ var Piece = function(color, type, position){
     this.$el.on('click', this.highlight.bind(this));
   };
 
-  this.highlight = function(event) {
-    var el = event.currentTarget;
-
-    if (!this.matchesTurnColor($(el), $('.turn-tracker'))) {
+  this.highlight = function() {
+    if (!this.matchesTurnColor(this.$el, $('.turn-tracker'))) {
       return;
     }
-    //validate your own pieces are the one you're clicking
-    $(el).toggleClass("highlighted")
-    $('.piece').not(el).removeClass("highlighted");
+    //TODO: validate your own pieces are the one you're clicking
+    this.$el.toggleClass("highlighted")
+    $('.piece').not(this.$el).removeClass("highlighted");
 
     BoardListener.send("piece.clicked", {
       position: this.position,
-      active: $(el).hasClass("highlighted")
+      active: this.$el.hasClass("highlighted")
     });
   };
 
@@ -62,10 +60,26 @@ var Piece = function(color, type, position){
       if (!response.success) {
         this.unMovePiece()
         alert("Invalid move, sorry");
+        return
       }
 
       if(response.victory) {
         alert("Congratulations, you win!")
+        return
+      }
+
+      if(response.move) {
+        var targetPiece = response.move.piece;
+        var piece = Pieces.find(function(p) {
+          return p.color == targetPiece.color && p.type == targetPiece.type;
+        });
+
+        piece.highlight();
+
+        setTimeout(function() {
+          piece.movePiece(response.move.target);
+          $('.node').removeClass("highlighted");
+        }, 1000);
       }
     }.bind(this));
   }

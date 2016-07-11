@@ -34,7 +34,14 @@ class PlayController < ApplicationController
     valid = board.legal_move?(move)
     victory = board.is_winning_move?(move);
 
-    render :json => { success: valid, victory: victory }
+    if valid && !victory #&& ai
+      @ai = AI.new({random: true})
+      next_board = board.get_board_state_after_move(move)
+      next_color = move.piece.color == "red" ? "blue" : "red"
+      next_move = @ai.move(next_board, next_color)
+    end
+
+    render :json => { success: valid, victory: victory, move: next_move }
   end
 
   def send_move_2
