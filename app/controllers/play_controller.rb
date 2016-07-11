@@ -12,6 +12,14 @@ class PlayController < ApplicationController
   def move
     #client checks if there's a new move from their opponent
     #returns json object indicating whether and what the move is
+
+    #be like#
+    #get game from db that matches params[:id]
+    #move = most recent move
+    #if move.player != player
+    #return move
+    #else
+    #return false
   end
 
   def send_move
@@ -29,7 +37,21 @@ class PlayController < ApplicationController
     render :json => { success: valid, victory: victory }
   end
 
+  def send_move_2
+    #find game from db based on params[:id]
+    #board = game.board
+    #move = Move.new_from_json(params[:move])
+    #valid = board.legal_move?(move)
+    #if valid
+    #game.addMove(move)
 
+    #other_player = game.player that isn't this person
+    #if other_player.is_ai
+    #  ai = new AI(board)
+    #  ai.delay.findMove(board) ##using resque
+    #else
+
+  end
 
   private
     def valid_id(id)
