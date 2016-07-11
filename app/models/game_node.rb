@@ -68,90 +68,77 @@ class GameNode
   #   return (base + index).chr
   # end
 
-  # def losing_node?(book, evaluator, depth)
-  #   if(!book[@code].nil? && !book[@code].is_a?(Array))
-  #     return book[@code] == :losing
-  #   end
+  def losing_node?(evaluator, depth)
+    # if(!book[@code].nil? && !book[@code].is_a?(Array))
+    #   return book[@code] == :losing
+    # end
 
-  #   if board.over?    
-  #     verdict = board.winner != evaluator
+    if board.over?    
+      verdict = board.winner != evaluator
       
-  #     book[@code] = :losing if verdict
-  #     return verdict
-  #   end
+      # book[@code] = :losing if verdict
+      return verdict
+    end
 
-  #   if (depth <= 0)
-  #     return nil
-  #   end
+    if (depth <= 0)
+      return nil
+    end
 
-  #   if self.next_mover_side == evaluator
-  #     verdict = self.children.all? do |node|
-  #       node.losing_node?(book, evaluator, depth - 1)
-  #     end
+    if self.next_mover_side == evaluator
+      verdict = self.children.all? do |node|
+        node.losing_node?(evaluator, depth - 1)
+      end
+    else
+      verdict = self.children.any? do |node| 
+        node.losing_node?(evaluator, depth - 1)
+      end
+    end
 
-  #     book[@code] = :losing if verdict
-  #     return verdict
-  #   else
-  #     verdict = self.children.any? do |node| 
-  #       node.losing_node?(book, evaluator, depth - 1)
-  #     end
+    # book[@code] = :losing if verdict
+    return verdict
+  end
 
-  #     book[@code] = :losing if verdict
-  #     return verdict
-  #   end
-  # end
+  def winning_node?(evaluator, depth)    
+    # if(!book[@code].nil? && !book[@code].is_a?(Array))
+    #   return book[@code] == :winning
+    # end
 
-  # def winning_node?(book, evaluator, depth)    
-  #   if(!book[@code].nil? && !book[@code].is_a?(Array))
-  #     return book[@code] == :winning
-  #   end
-
-  #   if board.over?  
-  #     verdict = board.winner == evaluator
+    if board.over?  
+      verdict = board.winner == evaluator
       
-  #     book[@code] = :winning if verdict
-  #     return verdict
-  #   end
+      # book[@code] = :winning if verdict
+      return verdict
+    end
 
-  #   if (depth <= 0)
-  #     return nil
-  #   end
+    if (depth <= 0)
+      return nil
+    end
 
-  #   if self.next_mover_side == evaluator
-  #     verdict = self.children.any? do |node| 
-  #       node.winning_node?(book, evaluator, depth - 1)
-  #     end
+    if self.next_mover_side == evaluator
+      verdict = self.children.any? do |node| 
+        node.winning_node?(evaluator, depth - 1)
+      end
+    else
+      verdict = self.children.all? do |node| 
+        node.winning_node?(evaluator, depth - 1)
+      end
+    end
 
-  #     book[@code] = :winning if verdict
-  #     return verdict
-  #   else
-  #     verdict = self.children.all? do |node| 
-  #       node.winning_node?(book, evaluator, depth - 1)
-  #     end
+    # book[@code] = :winning if verdict
+    return verdict
+  end
 
-  #     book[@code] = :winning if verdict
-  #     return verdict
-  #   end
-  # end
-
-  # def score_node(book, evaluator, depth)
+  # def score_node(evaluator, depth)
   #   #the more children it has, the better
   #   #0 children is checkmated, == loss, == 0
   #   #all losing children also == 0
-  #   #all winning children == 1
-  #   #max # of children is 24
-  #   #children with more children are better
-  #   #a move's score is a decimal between 0 and 1
+  #   #all winning children == 100
 
-  #   #a node starts out being worth 0.5
-  #   #non-losing children are worth 0.02 
-  #   #  * their own score (default to 0.5)
-  #   #losing children are worth -0.02
-  #   if(book[@code].is_a?(Array) && book[@code].length - 1 >= depth)
-  #     return book[@code][-1]
-  #   end
+  #   # if(book[@code].is_a?(Array) && book[@code].length - 1 >= depth)
+  #   #   return book[@code][-1]
+  #   # end
 
-  #   value = BASE_NODE_VALUE
+  #   value = 0
   #   return value if (depth <= 0)
 
   #   adjustment = 0
@@ -165,13 +152,21 @@ class GameNode
 
   #   value = [value + adjustment, MAX_NON_WINNING_VALUE].min
 
-  #   if (book[@code] != :winning && book[@code] != :losing)
-  #     book[@code] ||= []
-  #     book[@code][depth] = value
-  #   end
+  #   # if (book[@code] != :winning && book[@code] != :losing)
+  #   #   book[@code] ||= []
+  #   #   book[@code][depth] = value
+  #   # end
 
   #   return self.next_mover_side == evaluator ? value : 1 - value
   # end
+
+  def score_node(evaluator, depth)
+    
+  end
+
+  def simple_score_node
+    @board.legal_moves(@next_mover_side).length
+  end
 
   # This method generates an array of all moves that can be made after
   # the current move.

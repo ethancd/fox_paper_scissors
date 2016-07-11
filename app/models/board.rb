@@ -137,7 +137,7 @@ class Board
   end
 
   def is_in_checkmate?(side)
-    legal_moves(side).count == 0
+    legal_moves(side).length == 0
   end
 
   def adjacent_spaces(pos)
