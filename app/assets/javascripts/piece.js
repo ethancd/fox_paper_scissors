@@ -56,15 +56,16 @@ var Piece = function(color, type, position){
       }
     };
 
-    $.post('/play/move/', gameState, function(response) {
-      if (response.success) {
-        this.movePiece(target)
+    this.movePiece(target)
 
-        if(response.victory) {
-          alert("Congratulations, you win!")
-        }
-      } else {
+    $.post('/play/move/', gameState, function(response) {
+      if (!response.success) {
+        this.unMovePiece()
         alert("Invalid move, sorry");
+      }
+
+      if(response.victory) {
+        alert("Congratulations, you win!")
       }
     }.bind(this));
   }
@@ -74,12 +75,20 @@ var Piece = function(color, type, position){
       return;
     }
 
+    this.priorPosition = this.position;
     this.position = target;
     this.moveToPosition();
     BoardListener.send("piece.moved", {color: this.color});
 
     this.$el.removeClass("highlighted")
   };
+
+  this.unMovePiece = function () {
+    this.position = this.priorPosition;
+    this.moveToPosition();
+
+    BoardListener.send("piece.unmoved", {color: this.color})
+  }
 
   this.moveToPosition = function() {
     var $target = $('.node').filter(function(i, el) {

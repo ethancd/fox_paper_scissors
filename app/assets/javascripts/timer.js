@@ -3,6 +3,7 @@ var Timer = function (){
     this.turnTrackerEl = $('.turn-tracker');
     this.startTurnTracker();
     BoardListener.listen("piece.moved", this.toggleTurnTracker.bind(this));
+    BoardListener.listen("piece.unmoved", this.resetTurnTracker.bind(this));
     BoardListener.listen("reset", this.startTurnTracker.bind(this));
   };
 
@@ -19,6 +20,11 @@ var Timer = function (){
       this.turnTrackerEl.addClass("red");
     }
   };
+
+  this.resetTurnTracker = function(data) {
+    this.turnTrackerEl.removeClass("red blue");
+    this.turnTrackerEl.addClass(data.color);
+  }
 };
 
 
