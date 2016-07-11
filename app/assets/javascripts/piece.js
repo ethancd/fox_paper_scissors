@@ -18,7 +18,11 @@ var Piece = function(color, type, position){
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
 
-    this.$el.on('click', this.highlight.bind(this));
+    this.$el.on('click', function() {
+      if (this.color === "red") {
+        this.highlight()
+      }
+    }.bind(this));
   };
 
   this.highlight = function() {
