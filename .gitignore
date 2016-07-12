@@ -16,9 +16,11 @@
 # Ignore Byebug command history file.
 .byebug_history
 
-*.DS_Store
+.DS_Store
 
 gulpfile.js
 node_modules/
 npm-debug.log
 package.json
+
+config/secrets.yml
