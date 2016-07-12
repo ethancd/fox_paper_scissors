@@ -38,10 +38,11 @@ class PlayController < ApplicationController
       @ai = AI.new
       next_board = board.get_board_state_after_move(move)
       next_color = move.piece.color == "red" ? "blue" : "red"
-      next_move = @ai.move(next_board, next_color)
+      
+      @ai.async_move(next_board, next_color)
     end
 
-    render :json => { success: valid, victory: victory, move: next_move }
+    render :json => { success: valid, victory: victory }
   end
 
   def send_move_2

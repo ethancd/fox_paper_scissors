@@ -28,6 +28,7 @@ class GameSolver
     @colors = ["red", "blue"]
     @types = ["rock", "paper", "scissors"]
     @table = {}
+    @positions_written = 0
 
     @grammar = GameGrammar.new
 
@@ -49,7 +50,9 @@ class GameSolver
       counter += 1
 
       if counter % 100000 == 0
-        puts "#{counter} done at #{Time.now.getutc.to_s}"
+        puts "#{counter} checked at #{Time.now.getutc.to_s}"
+        puts "#{@positions_written} saved in text file"
+
         save_file
         @table = {}
       end
@@ -63,11 +66,12 @@ class GameSolver
 
     @colors.each do |color|
       key = get_code(color)
-
-      #next if @table.key?(key)
       value = get_score(key)
 
-      @table[key] = value
+      if key && value
+        @table[key] = value 
+        @positions_written += 1
+      end
     end
   end
 

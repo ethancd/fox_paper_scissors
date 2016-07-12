@@ -7,6 +7,10 @@ class AI
     @random = options[:random] || false
   end
 
+  def async_move(board, side)
+    Resque.enqueue(FindMove, board side)
+  end
+
   def move(board, side)
     if @random
       random_move(board, side)

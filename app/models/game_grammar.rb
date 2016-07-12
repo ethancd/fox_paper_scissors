@@ -24,6 +24,9 @@ class GameGrammar
 
     active_pieces, passive_pieces = split_pieces(board_code)
     enemy_map = get_enemy_map(active_pieces, passive_pieces)
+
+    return nil if illegal_position?(active_pieces, passive_pieces, enemy_map)
+
     mobile_pieces = get_mobile_pieces(active_pieces, enemy_map)
 
     mobile_pieces.each do |piece|
@@ -36,6 +39,23 @@ class GameGrammar
     end
 
     legal_moves_count
+  end
+
+  def illegal_position?(active_pieces, passive_pieces, active_enemy_map)
+    passive_enemy_map = get_enemy_map(passive_pieces, active_pieces)
+
+    active_threatened_pieces = get_threatened_pieces(active_pieces, active_enemy_map)
+    passive_threatened_pieces = get_threatened_pieces(passive_pieces, passive_enemy_map)
+
+    illegal = active_threatened_pieces.length > 1 || passive_threatened_pieces.any? 
+
+    return illegal
+  end
+
+  def swap_sides(board_code)
+    board_code[0] = (board_code[0] == "r") ? "b" : "r"
+
+    board_code
   end
 
   def valid?(destination, pieces, enemy)
@@ -62,18 +82,15 @@ class GameGrammar
   end
 
   def get_mobile_pieces(active_pieces, enemy_map)
-    threatened_pieces = active_pieces.select do |piece|
+    threatened_pieces = get_threatened_pieces(active_pieces, enemy_map)
+
+    threatened_pieces.any? ? threatened_pieces : active_pieces
+  end
+
+  def get_threatened_pieces(pieces, enemy_map)
+    pieces.select do |piece|
       enemy = enemy_map[piece]
       threatened?(piece, enemy)
-    end
-
-    case threatened_pieces.length
-      when 0
-        active_pieces
-      when 1
-        threatened_pieces
-      else
-        []
     end
   end
 
