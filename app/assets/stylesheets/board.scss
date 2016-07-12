@@ -1,0 +1,92 @@
+@import 'variables';
+
+.board {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  background-image: url(image_path('line_grid.png'));
+  background-size: contain;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+
+    height: 52px;
+    margin-top: 14px;
+    overflow: visible;
+
+    &.long {
+      width: 100%;
+
+      .node {
+        background-color: #ccc;
+      }
+    }
+
+    &.short {
+      width: 70%;
+      margin-right: auto;
+      margin-left: auto;
+
+      .node {
+        background-color: #777;
+      }
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .node {
+    height: 50px;
+    width: 50px;
+    float: left;
+    border-radius: 50%;
+    border: 1px solid #000;
+    margin-left: 50px;
+    overflow: visible;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &.highlighted {
+      box-shadow: 0 0 20px #ffd700;
+    }
+  }
+
+  .piece {
+    position: absolute;
+    z-index: 2;
+    height: 50px;
+    width: 50px;
+    border: 1px solid #000;
+    border-radius: 50%;
+    background-size: contain;
+
+    &.highlighted {
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    &.red {
+      background-color: red;
+    }
+
+    &.blue {
+      background-color: blue;
+    }
+
+    &.rock {
+      background-image: url(image_path('rock.png'));
+    }
+
+    &.paper {
+      background-image: url(image_path('paper.png'));
+    }
+
+    &.scissors {
+      background-image: url(image_path('scissors.png'));
+    }
+  }
+}

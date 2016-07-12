@@ -1,10 +1,10 @@
 <% 7.times do |i| %>
-  <% even = i%2 == 0  %>
+  <div class="row <%= i%2 == 0 ? 'long' : 'short' %>">
 
-  <div class="row <%= even ? 'long' : 'short' %>">
     <% 7.times do |j| %>
-      <% next unless i % 2 == j % 2 %>
+      <% next unless i%2 == j%2 %>
       <% id = "x-#{j}-y-#{i}" %>
+      
       <div class="node" id="<%= id %>"></div>
     <% end %>
 

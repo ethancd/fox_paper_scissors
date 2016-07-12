@@ -1,0 +1,29 @@
+@import 'variables';
+
+.timer {
+  position: relative;
+  width: calc(20% - 25px);
+  height: 100%;
+  color: $timer-text-color;
+  background-color: $timer-color;
+
+  .turn-tracker {
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin: auto;
+    left: 0;
+    right: 0;
+
+    &.red {
+      top: 50px;
+      background-color: red;
+    }
+
+    &.blue {
+      bottom: 50px;
+      background-color: blue;
+    }
+  }
+}

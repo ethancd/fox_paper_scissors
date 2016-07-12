@@ -1,0 +1,35 @@
+@import 'variables';
+
+.chat {
+  width: calc(20% - 25px);
+  height: 100%;
+  background-color: $chat-color;
+  font-size: 16px;
+
+  .messages {
+    height: 80%;
+    margin: 2px;
+    background-color: $chat-messages-color;
+    overflow: auto;
+
+    .message {
+      width: 100%;
+      margin: 1px;
+      color: $chat-text-color;
+    }
+  }
+
+  textarea {
+    width: calc(100% - 10px);
+    height: 32px;
+    margin: 5px;
+    padding: 0;
+    border: 0;
+    background-color: $chat-messages-color;
+  }
+
+  button {
+    background-color: orange;
+    float: right;
+  }
+}
