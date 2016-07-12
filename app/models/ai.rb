@@ -25,7 +25,7 @@ class AI
 
     begin
       require "timeout"
-      Timeout::timeout(15) do
+      Timeout::timeout(5) do
         loop do
           evaluated_move = find_move(possible_moves, side, depth)
 

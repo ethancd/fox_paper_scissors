@@ -17,3 +17,8 @@
 .byebug_history
 
 *.DS_Store
+
+gulpfile.js
+node_modules/
+npm-debug.log
+package.json

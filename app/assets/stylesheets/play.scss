@@ -154,6 +154,7 @@ $chat-text-color: #333;
     height: 80%;
     margin: 2px;
     background-color: $chat-messages-color;
+    overflow: auto;
 
     .message {
       width: 100%;
