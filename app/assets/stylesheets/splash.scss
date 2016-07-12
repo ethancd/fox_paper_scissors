@@ -53,12 +53,12 @@
     color: #fff;
     text-decoration: none;
 
-    &:first-child {
+    &.ai {
       float: left;
       background-color: #0a0;
     }
 
-    &:last-child {
+    &.human {
       float: right;
       background-color: #00d;
     }

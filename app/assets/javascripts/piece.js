@@ -1,3 +1,9 @@
+//when $el gets deleted/removed from page,
+//these js should get destroyed
+//+ removed from Pieces array
+
+//leaving it for react to deal with! hahaha
+
 var Piece = function(color, type, position){
   this.initialize = function() {
     this.$el = $("." + color + "." + type);
