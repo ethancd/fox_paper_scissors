@@ -1,7 +1,7 @@
 class Game < ApplicationRecord
+  has_one :board
   has_many :players
   has_many :moves
-  has_one :board
-  has_one :chat
   
+
 end
