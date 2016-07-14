@@ -1,12 +1,16 @@
-<h1 class="site-title">Play Fox Paper Scissors!</h1>
+<h1 class="site-title">Fox Paper<br>Scissors</h1>
 
-<div class="links-container">
-  <a href="play/ai/" class="ai">Play vs. AI</a>
-  <a href="play/human/" class="human">Play vs. Human</a>
+<div class="container">
+  <div class="links-container">
+    <a href="play/ai/" class="ai">Play vs. AI</a>
+    <a href="play/human/" class="human">Play vs. Human</a>
+  </div>
+
+  <div class="tutorial-area">
+    <%= render "shared/board" %>
+  </div>
+
+  <p class="site-description"><strong>Fox Paper Scissors</strong> is an original game that combines the <a href="https://en.wikipedia.org/wiki/Nontransitive_game">non-transitivity</a> of Rock Paper Scissors with the chasing mechanics of traditional <a href="https://en.wikipedia.org/wiki/Fox_games">fox games</a>.</p>
 </div>
 
-<div class="tutorial-area">
-  <%= render "shared/board" %>
-</div>
-
-<p class="site-description"><strong>Fox Paper Scissors</strong> is an original game that combines the <a href="https://en.wikipedia.org/wiki/Nontransitive_game">non-transitivity</a> of Rock, Paper, Scissors with the pawn-chasing mechanics of traditional <a href="https://en.wikipedia.org/wiki/Fox_games">fox games</a>.</p>
+<div class="splash-image"></div>

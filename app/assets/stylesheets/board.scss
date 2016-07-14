@@ -71,22 +71,34 @@
 
     &.red {
       background-color: red;
+
+      &.rock {
+        background-image: url(image_path('rock_black.png'));
+      }
+
+      &.paper {
+        background-image: url(image_path('paper_black.png'));
+      }
+
+      &.scissors {
+        background-image: url(image_path('scissors_black.png'));
+      }
     }
 
     &.blue {
       background-color: blue;
-    }
 
-    &.rock {
-      background-image: url(image_path('rock.png'));
-    }
+      &.rock {
+        background-image: url(image_path('rock_white.png'));
+      }
 
-    &.paper {
-      background-image: url(image_path('paper.png'));
-    }
+      &.paper {
+        background-image: url(image_path('paper_white.png'));
+      }
 
-    &.scissors {
-      background-image: url(image_path('scissors.png'));
+      &.scissors {
+        background-image: url(image_path('scissors_white.png'));
+      }
     }
   }
 }

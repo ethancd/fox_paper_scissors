@@ -1,9 +1,9 @@
 module ApplicationCable
   class Connection < ActionCable::Connection::Base
-    identified_by :uuid
+    identified_by :user_name
 
     def connect
-      self.uuid = SecureRandom.uuid
+      self.user_name = cookies[:user_name]
     end
   end
 end

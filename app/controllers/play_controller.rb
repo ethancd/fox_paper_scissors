@@ -1,5 +1,3 @@
-require 'securerandom'
-
 class PlayController < ApplicationController
   def ai
     redirect_to action: "ai", id: generate_id unless valid_id(params[:id])
@@ -39,10 +37,11 @@ class PlayController < ApplicationController
       next_board = board.get_board_state_after_move(move)
       next_color = move.piece.color == "red" ? "blue" : "red"
       
-      @ai.async_move(next_board, next_color)
+      #@ai.async_move(next_board, next_color)
+      next_move = @ai.move(next_board, next_color)
     end
 
-    render :json => { success: valid, victory: victory }
+    render :json => { success: valid, victory: victory, move: next_move }
   end
 
   def send_move_2

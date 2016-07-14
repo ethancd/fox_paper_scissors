@@ -1,7 +1,9 @@
-<h3 class="player-name red">Player 1 (You)</h3>
+<h3 class="player-name red"><%= cookies[:user_name] %> (You)</h3>
   <div class="play-area">
     <%= render "shared/timer" %>
     <%= render "shared/board" %>
     <%= render "shared/chat" %>
   </div>
-<h3 class="player-name blue">Player 2 (AI)</h3>
+<h3 class="player-name blue">dauntless_robot (AI)</h3>
+
+<div class="play-image"></div>

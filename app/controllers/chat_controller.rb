@@ -5,7 +5,7 @@ class ChatController < ApplicationController
 
     ActionCable.server.broadcast('messages', {
       action: "new_message",
-      message: params[:text]
+      message: add_author(params[:text])
     })
 
 
@@ -15,6 +15,10 @@ class ChatController < ApplicationController
   end
 
   private
+    def add_author(text)
+      "#{cookies[:user_name]}: #{text}"
+    end
+
     # def build_response(text)
     #   return { 
     #     text: text.upcase,

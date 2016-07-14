@@ -1,7 +1,7 @@
 @import 'variables';
 
 .chat {
-  width: calc(20% - 25px);
+  width: 225px;
   height: 100%;
   background-color: $chat-color;
   font-size: 16px;
@@ -11,10 +11,11 @@
     margin: 2px;
     background-color: $chat-messages-color;
     overflow: auto;
+    font-family: 'Open Sans', sans-serif;
 
     .message {
       width: 100%;
-      margin: 1px;
+      margin: 5px 1px 1px 1px;
       color: $chat-text-color;
     }
   }
@@ -26,10 +27,12 @@
     padding: 0;
     border: 0;
     background-color: $chat-messages-color;
+    font-family: 'Open Sans', sans-serif;
   }
 
   button {
     background-color: orange;
     float: right;
+    font-family: 'Open Sans', sans-serif;
   }
 }

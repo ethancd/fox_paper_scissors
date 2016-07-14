@@ -10,7 +10,7 @@ App.chat = App.cable.subscriptions.create("ChatChannel", {
 
     switch(data.action) {
       case "user_joined":
-        var message = buildMessage("New user joined! Say hello!")
+        var message = buildMessage(data.message + " has joined")
         displayMessage(message);
         break;
       case "new_message":
@@ -19,7 +19,6 @@ App.chat = App.cable.subscriptions.create("ChatChannel", {
     };
   }
 });
-  
 
 var attachHandlers = function() {
   $(".chat textarea").on('keypress', function(event) {

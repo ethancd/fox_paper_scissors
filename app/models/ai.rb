@@ -8,7 +8,7 @@ class AI
   end
 
   def async_move(board, side)
-    Resque.enqueue(FindMove, board side)
+    Resque.enqueue(FindMove, board, side)
   end
 
   def move(board, side)
