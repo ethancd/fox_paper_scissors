@@ -1,0 +1,12 @@
+<%= render partial: "shared/player_name", locals: {player: @game.players.first, user: @user} %>
+
+<div class="play-area">
+  <%= render "shared/timer" %>
+  <%= render "shared/board" %>
+  <%= render "shared/chat" %>
+</div>
+
+<%= render partial: "shared/player_name", locals: {player: @game.players.last, user: @user} %>
+
+
+<div class="play-image"></div>
