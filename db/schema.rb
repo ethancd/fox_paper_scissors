@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160714165927) do
+ActiveRecord::Schema.define(version: 20160714195047) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,11 +20,15 @@ ActiveRecord::Schema.define(version: 20160714165927) do
     t.string   "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "game_id"
+    t.index ["game_id"], name: "index_boards_on_game_id", using: :btree
   end
 
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "game_id"
+    t.index ["game_id"], name: "index_chats_on_game_id", using: :btree
   end
 
   create_table "games", force: :cascade do |t|
@@ -36,18 +40,28 @@ ActiveRecord::Schema.define(version: 20160714165927) do
     t.string   "text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "chat_id"
+    t.uuid     "author_id"
+    t.index ["chat_id"], name: "index_messages_on_chat_id", using: :btree
   end
 
   create_table "moves", force: :cascade do |t|
     t.string   "delta"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "game_id"
+    t.integer  "player_id"
+    t.index ["game_id"], name: "index_moves_on_game_id", using: :btree
+    t.index ["player_id"], name: "index_moves_on_player_id", using: :btree
   end
 
   create_table "players", force: :cascade do |t|
     t.boolean  "first"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid     "user_id"
+    t.integer  "game_id"
+    t.index ["game_id"], name: "index_players_on_game_id", using: :btree
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -56,4 +70,10 @@ ActiveRecord::Schema.define(version: 20160714165927) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "boards", "games"
+  add_foreign_key "chats", "games"
+  add_foreign_key "messages", "chats"
+  add_foreign_key "moves", "games"
+  add_foreign_key "moves", "players"
+  add_foreign_key "players", "games"
 end

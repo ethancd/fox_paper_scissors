@@ -1,6 +1,7 @@
 class User < ApplicationRecord
-  # has_many :players
-  # has_many :messages, as: :author
+  has_many :players
+  has_many :messages, foreign_key: 'author_id'
+  has_many :games, through: :players
 
   after_initialize :ensure_name
 

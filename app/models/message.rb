@@ -1,4 +1,4 @@
 class Message < ApplicationRecord
   belongs_to :chat
-  belongs_to :user, as: :author
+  belongs_to :author, class_name: 'User'
 end
