@@ -1,4 +1,4 @@
-<%= render partial: "shared/player_name", locals: { player: @game.players.first, user: @user } %>
+<%= render partial: "shared/player_name", locals: { player: @game.players[0], user: @user } %>
 
 <div class="play-area">
   <%= render "shared/timer" %>
@@ -6,11 +6,12 @@
   <%= render partial: "shared/chat", locals: { chat: @game.chat } %>
 </div>
 
-<%= render partial: "shared/player_name", locals:  { player: @game.players.last, user: @user } %>
+<%= render partial: "shared/player_name", locals:  { player: @game.players[1], user: @user } %>
 
 
 <div class="play-image"></div>
 
 <%= javascript_tag do %>
-    var Pieces = <%= @game.board.pieces.to_json.html_safe %>;
+    var Pieces = <%= @game.board.nil? ? [] : @game.board.pieces.to_json.html_safe %>;
+    var player = <%= Player.find_by({user_id: @user.id, game_id: @game.id}).to_json.html_safe %>;
 <% end %>

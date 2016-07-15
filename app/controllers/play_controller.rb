@@ -22,6 +22,17 @@ class PlayController < ApplicationController
       return redirect_to action: "ai", slug: params[:slug]
     end
 
+    if @game.players.length == 0 
+      @game.players.create({user_id: @user.id, first: true})
+      @game.create_chat
+      @game.save
+    elsif @game.players.length == 1 && @game.players[0].user_id != @user.id
+      @game.players.create({user_id: @user.id})
+      @game.shuffle_player_order
+      @game.create_board
+      @game.save
+    end
+
     render "index"
   end
 
@@ -60,11 +71,11 @@ class PlayController < ApplicationController
     end
 
     def build_game(user_id1, user_id2)
-      players = Game.build_players(user_id1, user_id2)
-      @game.players.create(players)
+      @game.players.new([{user_id: user_id1}, {user_id: user_id2}])
+      @game.shuffle_player_order
 
-      @game.create_board
       @game.create_chat
+      @game.create_board
       @game.save
 
       @game

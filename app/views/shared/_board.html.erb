@@ -1,5 +1,6 @@
+<% pieces = board.nil? ? [] : board.pieces %>
 <div class="board">
   <% 7.times do |i| %>
-    <%= render partial: "shared/row", locals: { pieces: board.pieces, i: i } %>
+    <%= render partial: "shared/row", locals: { pieces: pieces, i: i } %>
   <% end %>
 </div>

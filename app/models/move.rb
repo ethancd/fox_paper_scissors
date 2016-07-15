@@ -16,6 +16,6 @@ class Move < ApplicationRecord
   end
 
   def broadcast_update
-    self.game.broadcast_position_update
+    self.game.broadcast_position_update(self.player.color)
   end
 end
