@@ -150,28 +150,6 @@ var Piece = function(color, type, position){
   }
 };
 
-var Pieces = [];
-
-var generatePieces = function() {
-  var colors = ["red", "blue"];
-  var types = ["rock", "paper", "scissors"];
-
-  if (Pieces.length) {
-    Pieces = [];
-  }
-  
-  for (var i = 0; i < colors.length; i++) {
-    for (var j = 0; j < types.length; j++) {
-      var $el = $("." + colors[i] + "." + types[j]);
-      var node = $el.parent()
-      var position = getPosition(node);
-
-      var piece = new Piece(colors[i], types[j], position).initialize();
-      Pieces.push(piece);
-    }
-  }
-};
-
 var getPosition = function(node) {
   return node.attr("id").match(/\d/g);
 }
@@ -188,6 +166,58 @@ var getPieceData = function() {
   return pieceData;
 }
 
+var setPiecesToPosition = function(position) {
+  for (var i = 0; i < Pieces.length; i++) {
+    var piece = Pieces[i]
+    coords = getCoords(position[i]);
+    piece.position = coords;
+    piece.moveToPosition();
+  }
+};
+
+var initializePieces = function() { 
+  for (var i = 0; i < Pieces.length; i++) {
+    var pieceData = Pieces[i]
+    var piece = new Piece(pieceData.color, pieceData.type, pieceData.position).initialize();
+    Pieces[i] = piece;
+  }
+};
+
+var getCoords = function(letter) {
+  var base = "a".charCodeAt(0);
+  var index = letter.charCodeAt(0) - base;
+  var coords = [
+      [0,0],
+      [2,0],
+      [4,0],
+      [6,0],
+      [1,1],
+      [3,1],
+      [5,1],
+      [0,2],
+      [2,2],
+      [4,2],
+      [6,2],
+      [1,3],
+      [3,3],
+      [5,3],
+      [0,4],
+      [2,4],
+      [4,4],
+      [6,4],
+      [1,5],
+      [3,5],
+      [5,5],
+      [0,6],
+      [2,6],
+      [4,6],
+      [6,6]
+  ];
+
+  return coords[index];
+}
+
+
 $(document).on('turbolinks:load', function () {
-  generatePieces();
+  initializePieces();
 })

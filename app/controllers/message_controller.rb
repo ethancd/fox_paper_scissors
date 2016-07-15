@@ -4,7 +4,7 @@ class MessageController < ApplicationController
     params.inspect
     @message = Message.create(message_params)
 
-    ActionCable.server.broadcast('messages', {
+    ActionCable.server.broadcast("chat_#{params[:chat_id]}", {
       action: "new_message",
       message: @message.get_formatted_text,
       color: @message.get_color

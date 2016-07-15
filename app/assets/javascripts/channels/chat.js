@@ -1,31 +1,3 @@
-App.chat = App.cable.subscriptions.create({
-    channel: "ChatChannel"//,
-    //chat_id: $(".chat").attr('id')
-  }, {
-  connected: function() {
-    //Called when the subscription is ready for use on the server
-  },
-  disconnected: function () {
-    //Called when the subscription has been terminated by the server
-  },
-  received: function(data) {
-    //Called when there's incoming data on the websocket for this channel
-
-    switch(data.action) {
-      case "user_joined":
-        var message = buildMessage(data.message + " has joined")
-        displayMessage(message);
-        break;
-      case "new_message":
-       displayMessage(buildMessage(data));
-       break;
-      case "position_update":
-       displayMessage(buildMessage(data));
-       break;
-    };
-  }
-});
-
 var attachHandlers = function() {
   $(".chat textarea").on('keypress', function(event) {
     if(event.which == 13) {
@@ -61,4 +33,34 @@ var buildMessage = function(data) {
   return $el;
 };
 
-$(document).on('turbolinks:load', attachHandlers);
+var subscribe = function() {
+  App.chat = App.cable.subscriptions.create({
+      channel: "ChatChannel",
+      chat_id: $(".chat").attr('id')
+    }, {
+    connected: function() {
+      //Called when the subscription is ready for use on the server
+    },
+    disconnected: function () {
+      //Called when the subscription has been terminated by the server
+    },
+    received: function(data) {
+      //Called when there's incoming data on the websocket for this channel
+
+      switch(data.action) {
+        case "user_joined":
+          var message = buildMessage(data.message + " has joined")
+          displayMessage(message);
+          break;
+        case "new_message":
+         displayMessage(buildMessage(data));
+         break;
+      };
+    }
+  });
+}
+
+$(document).on('turbolinks:load', function() {
+  attachHandlers();
+  subscribe();
+});

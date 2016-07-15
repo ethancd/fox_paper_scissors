@@ -4,6 +4,6 @@ class FindMove < ActiveJob::Base
   def perform(game)
     ai = game.players.find { |player| player.ai? }
     delta = ai.move(game.board.position, ai.color)
-    @move = game.moves.create!({delta: delta, player_id: ai.id })
+    game.moves.create!({delta: delta, player_id: ai.id })
   end
 end

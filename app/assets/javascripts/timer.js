@@ -3,6 +3,7 @@ var Timer = function (){
     this.turnTrackerEl = $('.turn-tracker');
     this.startTurnTracker();
     BoardListener.listen("piece.moved", this.toggleTurnTracker.bind(this));
+    BoardListener.listen("position.updated", this.toggleTurnTracker.bind(this));
     BoardListener.listen("piece.unmoved", this.resetTurnTracker.bind(this));
     BoardListener.listen("reset", this.startTurnTracker.bind(this));
   };
@@ -29,5 +30,5 @@ var Timer = function (){
 
 
 $(document).on('turbolinks:load', function() {
-  var board = new Timer().initialize();
+  var timer = new Timer().initialize();
 })

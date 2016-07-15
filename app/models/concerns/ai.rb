@@ -3,7 +3,7 @@ module AI
 
   attr_accessor :random
 
-  def move(board_position, side, random=false)
+  def move(board_position, side, random=true)
     if random
       random_move(board_position, side)
     else

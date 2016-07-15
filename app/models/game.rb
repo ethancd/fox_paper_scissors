@@ -16,8 +16,14 @@ class Game < ApplicationRecord
   end
 
   def broadcast_position_update
-    #actually broadcast on channel "#{game_slug}"
-    ActionCable.server.broadcast "messages", {action: "position_update", message: self.board.position }
+    ActionCable.server.broadcast "game_#{self.slug}", {
+      action: "position_update", 
+      position: self.board.position,
+      color: get_color_of_last_move }
+  end
+
+  def get_color_of_last_move
+    self.moves.last.player.color
   end
 
   def new?

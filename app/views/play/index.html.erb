@@ -10,3 +10,7 @@
 
 
 <div class="play-image"></div>
+
+<%= javascript_tag do %>
+    var Pieces = <%= @game.board.pieces.to_json.html_safe %>;
+<% end %>
