@@ -1,11 +1,5 @@
 <div class="board">
-  <%= render "shared/nodes" %>
-
-  <div class="piece red rock"></div>
-  <div class="piece red paper"></div>
-  <div class="piece red scissors"></div>
-
-  <div class="piece blue rock"></div>
-  <div class="piece blue paper"></div>
-  <div class="piece blue scissors"></div>
+  <% 7.times do |i| %>
+    <%= render partial: "shared/row", locals: { pieces: board.pieces, i: i } %>
+  <% end %>
 </div>

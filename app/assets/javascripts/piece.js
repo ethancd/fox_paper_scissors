@@ -11,10 +11,10 @@ var Piece = function(color, type, position){
     this.color = color;
     this.type = type;
 
-    this.originalPosition = position;
-    this.position = position;
+    // this.originalPosition = position;
+    // this.position = position;
 
-    this.moveToPosition();
+    // this.moveToPosition();
     this.attachHandlers();
 
     return this;

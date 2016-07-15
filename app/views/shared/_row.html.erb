@@ -1,0 +1,6 @@
+<div class="row <%= i%2 == 0 ? 'long' : 'short' %>">
+  <% 7.times do |j| %>
+    <% next unless i%2 == j%2 %>
+    <%= render partial: "shared/node", locals: { pieces: pieces, i: i, j: j } %> 
+  <% end %>
+</div>

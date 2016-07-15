@@ -1,0 +1,7 @@
+<div class="node" id="<%= "x-#{j}-y-#{i}" %>">
+  <% piece = pieces.find { |p| p.position[0] == j && p.position[1] == i } %>
+
+  <% if piece %>
+    <div class="piece <%= piece.color %> <%= piece.type %>"></div>
+  <% end %>
+</div>

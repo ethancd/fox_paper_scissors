@@ -24,3 +24,5 @@ npm-debug.log
 package.json
 
 config/secrets.yml
+
+dump.rdb

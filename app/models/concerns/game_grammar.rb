@@ -136,35 +136,42 @@ module GameGrammar
     base = 'a'.ord
     index = self.coords.index(position)
 
-    return (base + index).chr
+    (base + index).chr
+  end
+
+  def get_spot(letter)
+    base = 'a'.ord
+    index = letter.ord - base
+
+    self.coords[index]
   end
 
   def get_ordered_coords
     [
       [0,0],
-      [0,2],
-      [0,4],
-      [0,6],
-      [1,1],
-      [1,3],
-      [1,5],
       [2,0],
-      [2,2],
-      [2,4],
-      [2,6],
-      [3,1],
-      [3,3],
-      [3,5],
       [4,0],
-      [4,2],
-      [4,4],
-      [4,6],
-      [5,1],
-      [5,3],
-      [5,5],
       [6,0],
+      [1,1],
+      [3,1],
+      [5,1],
+      [0,2],
+      [2,2],
+      [4,2],
       [6,2],
+      [1,3],
+      [3,3],
+      [5,3],
+      [0,4],
+      [2,4],
+      [4,4],
       [6,4],
+      [1,5],
+      [3,5],
+      [5,5],
+      [0,6],
+      [2,6],
+      [4,6],
       [6,6]
     ]
   end

@@ -65,6 +65,7 @@ class PlayController < ApplicationController
     def build_game(user_id1, user_id2)
       players = Game.build_players(user_id1, user_id2)
       @game.players.create(players)
+
       @game.create_board
       @game.create_chat
       @game.save
