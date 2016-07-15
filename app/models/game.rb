@@ -15,6 +15,11 @@ class Game < ApplicationRecord
     players
   end
 
+  def broadcast_position_update
+    #actually broadcast on channel "#{game_slug}"
+    ActionCable.server.broadcast "messages", {action: "position_update", message: self.board.position }
+  end
+
   def new?
     self.players.nil? || self.players.length == 0
   end

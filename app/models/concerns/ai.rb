@@ -3,11 +3,24 @@ module AI
 
   attr_accessor :random
 
-  def move(board_position, side)
-    if true
+  def move(board_position, side, random=false)
+    if random
       random_move(board_position, side)
     else
-      timed_move(board_position, side)
+      fake_timed_move(board_position, side)
+    end
+  end
+
+  def fake_timed_move(board_position, side)
+    begin
+      require "timeout"
+      Timeout::timeout(5) do
+        loop do
+          1 + 1
+        end 
+      end
+    rescue Timeout::Error => e
+      return random_move(board_position, side)
     end
   end
 

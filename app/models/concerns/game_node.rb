@@ -129,8 +129,4 @@ class GameNode
 
     children
   end
-
-  def other_side(side)
-    side == "red" ? "blue" : "red"
-  end
 end

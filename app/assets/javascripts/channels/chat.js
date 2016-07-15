@@ -19,7 +19,7 @@ App.chat = App.cable.subscriptions.create({
       case "new_message":
        displayMessage(buildMessage(data));
        break;
-      case "move":
+      case "position_update":
        displayMessage(buildMessage(data));
        break;
     };

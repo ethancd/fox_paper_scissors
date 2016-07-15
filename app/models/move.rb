@@ -5,6 +5,7 @@ class Move < ApplicationRecord
   belongs_to :player
 
   after_create :update_board
+  after_commit :broadcast_update
 
   def update_board
     board = self.game.board
@@ -12,5 +13,9 @@ class Move < ApplicationRecord
     self.game.board.position = position
 
     board.save
+  end
+
+  def broadcast_update
+    self.game.broadcast_position_update
   end
 end

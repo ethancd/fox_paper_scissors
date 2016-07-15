@@ -35,8 +35,7 @@ class PlayController < ApplicationController
 
     opponent = @game.players.find { |player| player.user_id != @user.id }
     if opponent.ai?
-      delta = opponent.move(@game.board.position, opponent.color)
-      @move = @game.moves.create!({delta: delta, player_id: opponent.id })
+      FindMove.perform_later(@game)
     end
 
     render :json => { success: true } #@move.valid? }
