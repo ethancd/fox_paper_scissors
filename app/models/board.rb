@@ -3,8 +3,7 @@ class Board < ApplicationRecord
 
   belongs_to :game
 
-  #STARTING_POSITION = "ahbyxr".freeze
-  STARTING_POSITION = "acbywx".freeze
+  STARTING_POSITION = "ahbyxr".freeze
 
   after_initialize :setup_board
 

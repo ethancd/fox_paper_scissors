@@ -11,6 +11,7 @@ class Message < ApplicationRecord
     if !player.nil? 
       player.color == "red" ? colors[:red] : colors[:blue]
     else
+      #make colors persist for a non-player user in a given chat room
       return colors.values[2..-1].sample
     end
   end

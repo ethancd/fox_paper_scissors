@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  before_filter :get_user
+  before_action :get_user
 
   def get_user
     if cookies[:user_id]

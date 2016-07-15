@@ -31,7 +31,6 @@ var Piece = function(color, type, position){
     if (!this.matchesTurnColor(this.$el, $('.turn-tracker'))) {
       return;
     }
-    //TODO: validate your own pieces are the one you're clicking
     this.$el.toggleClass("highlighted")
     $('.piece').not(this.$el).removeClass("highlighted");
 
