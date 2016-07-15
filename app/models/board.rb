@@ -6,14 +6,10 @@ class Board < ApplicationRecord
   #STARTING_POSITION = "ahbyxr".freeze
   STARTING_POSITION = "acbywx".freeze
 
-  after_initialize :ensure_position
-  after_create :add_pieces
+  after_initialize :setup_board
 
-  def ensure_position
+  def setup_board
     self[:position] ||= STARTING_POSITION
-  end
-
-  def add_pieces
     @pieces = get_pieces(self[:position])
   end
 
@@ -46,7 +42,7 @@ class Board < ApplicationRecord
   end
 
   def position
-    @position
+    self[:position]
   end
 
 end

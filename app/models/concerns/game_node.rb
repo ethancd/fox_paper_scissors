@@ -123,7 +123,7 @@ class GameNode
     children = []
 
     get_legal_deltas(@game_position).each do |delta|
-      position = apply_delta_to_position(@game_position, delta)
+      position = apply_delta_to_game_position(@game_position, delta)
       children << GameNode.new(position, delta)
     end
 

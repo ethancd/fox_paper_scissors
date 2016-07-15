@@ -1,7 +1,4 @@
-//when $el gets deleted/removed from page,
-//these js should get destroyed
-//+ removed from Pieces array
-
+//temporary i hope hope hope
 //leaving it for react to deal with! hahaha
 
 var Piece = function(color, type, position){
@@ -11,10 +8,10 @@ var Piece = function(color, type, position){
     this.color = color;
     this.type = type;
 
-    // this.originalPosition = position;
-    // this.position = position;
+    this.originalPosition = position;
+    this.position = position;
 
-    // this.moveToPosition();
+    this.moveToPosition();
     this.attachHandlers();
 
     return this;
@@ -23,7 +20,6 @@ var Piece = function(color, type, position){
   this.attachHandlers = function() {
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
-
     this.$el.on('click', function() {
       if (this.color === "red") {
         this.highlight()
@@ -50,7 +46,7 @@ var Piece = function(color, type, position){
       return;
     }
 
-    var target = this.getPosition(data.node);
+    var target = getPosition(data.node);
     var turn = $(".turn-tracker").hasClass("red") ? "red" : "blue";
 
     var data = {
@@ -113,17 +109,13 @@ var Piece = function(color, type, position){
 
   this.moveToPosition = function() {
     var $target = $('.node').filter(function(i, el) {
-      var coords = this.getPosition($(el));
+      var coords = getPosition($(el));
       return this.isSameSpace(this.position, coords);
     }.bind(this))
 
     this.$el.detach();
     $target.append(this.$el);
   };
-
-  this.getPosition = function(node) {
-    return node.attr("id").match(/\d/g);
-  }
 
   this.isSameSpace = function(pos1, pos2) {
     for (var i = 0; i < pos1.length; i++) {
@@ -163,14 +155,6 @@ var Pieces = [];
 var generatePieces = function() {
   var colors = ["red", "blue"];
   var types = ["rock", "paper", "scissors"];
-  var positions = [
-    [0, 0],
-    [0, 2],
-    [2, 0],
-    [6, 6],
-    [4, 6],
-    [6, 4]
-  ];
 
   if (Pieces.length) {
     Pieces = [];
@@ -178,11 +162,19 @@ var generatePieces = function() {
   
   for (var i = 0; i < colors.length; i++) {
     for (var j = 0; j < types.length; j++) {
-      var piece = new Piece(colors[i], types[j], positions[i*3 + j]).initialize();
+      var $el = $("." + colors[i] + "." + types[j]);
+      var node = $el.parent()
+      var position = getPosition(node);
+
+      var piece = new Piece(colors[i], types[j], position).initialize();
       Pieces.push(piece);
     }
   }
 };
+
+var getPosition = function(node) {
+  return node.attr("id").match(/\d/g);
+}
 
 var getPieceData = function() {
   var pieceData = [];

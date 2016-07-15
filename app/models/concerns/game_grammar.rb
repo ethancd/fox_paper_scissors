@@ -50,11 +50,14 @@ module GameGrammar
     legal_deltas
   end
 
-  def apply_delta_to_position(game_position, delta)
-    side_initial = game_position[0]
-    board_position = game_position[1..-1]
+  def apply_delta_to_board_position(board_position, delta)
+    board_position.gsub(delta[0], delta[-1])
+  end
 
-    next_board_position = board_position.gsub(delta[0], delta[-1])
+  def apply_delta_to_game_position(game_position, delta)
+    side_initial = game_position[0]
+    next_board_position = apply_delta_to_board_position(game_position[1..-1], delta)
+
     next_game_position = side_initial + next_board_position
 
     swap_sides(next_game_position)
@@ -79,7 +82,7 @@ module GameGrammar
   end
 
   def swap_sides(game_position)
-    game_position[0] = other_side(game_position[0])
+    game_position[0] = other_initial(game_position[0])
 
     game_position
   end
@@ -174,6 +177,15 @@ module GameGrammar
       [4,6],
       [6,6]
     ]
+  end
+
+  def other_initial(initial)
+    case initial
+      when "red", "r"
+        "b"
+      when "blue", "b"
+        "r"
+    end
   end
 
   def other_side(side)

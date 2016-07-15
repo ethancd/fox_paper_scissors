@@ -25,7 +25,11 @@ var Board = function(){
       return;
     }
 
-    $('.node:empty').each(function(i, el) {
+    $('.node').each(function(i, el) {
+      if ($(el).children().length) {
+        return;
+      }
+
       var coords = $(el).attr("id").match(/\d/g);
       var adjacent = this.isAdjacent(coords, data.position);
 

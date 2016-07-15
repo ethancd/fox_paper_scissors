@@ -35,9 +35,7 @@ class PlayController < ApplicationController
 
     opponent = @game.players.find { |player| player.user_id != @user.id }
     if opponent.ai?
-      #opponent.async_move(@game.id)
-      #@game.board.position
-      delta = opponent.move("ahbyxr", opponent.color)
+      delta = opponent.move(@game.board.position, opponent.color)
       @move = @game.moves.create!({delta: delta, player_id: opponent.id })
     end
 
