@@ -1,5 +1,3 @@
-require_relative 'move'
-
 class Piece
   attr_reader :type, :color, :position
   attr_writer :position

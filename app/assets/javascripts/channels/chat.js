@@ -1,4 +1,7 @@
-App.chat = App.cable.subscriptions.create("ChatChannel", {
+App.chat = App.cable.subscriptions.create({
+    channel: "ChatChannel"//,
+    //chat_id: $(".chat").attr('id')
+  }, {
   connected: function() {
     //Called when the subscription is ready for use on the server
   },
@@ -14,6 +17,9 @@ App.chat = App.cable.subscriptions.create("ChatChannel", {
         displayMessage(message);
         break;
       case "new_message":
+       displayMessage(buildMessage(data));
+       break;
+      case "move":
        displayMessage(buildMessage(data));
        break;
     };

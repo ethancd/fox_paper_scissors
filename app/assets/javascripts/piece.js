@@ -53,20 +53,17 @@ var Piece = function(color, type, position){
     var target = this.getPosition(data.node);
     var turn = $(".turn-tracker").hasClass("red") ? "red" : "blue";
 
-    var gameState = {
-      board: {
-        pieces: getPieceData(), //global
-        turn: turn
-      },
+    var data = {
+      slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
       move: {
         target: target,
-        piece: this.serialize()
+        piece: this.position
       }
     };
 
     this.movePiece(target)
 
-    $.post('/play/move/', gameState, function(response) {
+    $.post('/play/move/', data, function(response) {
       if (!response.success) {
         this.unMovePiece()
         alert("Invalid move, sorry");

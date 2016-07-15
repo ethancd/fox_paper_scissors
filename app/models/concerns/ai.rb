@@ -1,22 +1,20 @@
-require_relative 'game_node'
-require_relative 'evaluated_move'
+module AI
+  include GameGrammar
 
-class AI
-
-  def initialize(options = {})
-    @random = options[:random] || false
-  end
-
-  def async_move(board, side)
-    Resque.enqueue(FindMove, board, side)
-  end
+  attr_accessor :random
 
   def move(board, side)
     if @random
-      random_move(board, side)
+      move = random_move(board, side)
     else
-      timed_move(board, side)
+      move = timed_move(board, side)
     end
+
+    get_delta(move)
+  end
+
+  def get_delta(move)
+    get_letter(move.piece.position) + "_" + get_letter(move.target)
   end
 
   def timed_move(board, side)

@@ -1,25 +1,20 @@
-require_relative 'board'
-
-class GameGrammar
-
-  def initialize
-    @moves_map = get_moves_map
-  end
+module GameGrammar
 
   def get_moves_map
-    coords = get_ordered_coords
+    @coords ||= get_ordered_coords
     board = Board.new()
     moves_map = Hash.new()
 
-    coords.each do |coord|
+    @coords.each do |coord|
       destinations = board.adjacent_spaces(coord)
-      moves_map[get_letter(coords, coord)] = destinations.map { |dest| get_letter(coords, dest) }
+      moves_map[get_letter(coord)] = destinations.map { |dest| get_letter(dest) }
     end
 
     return moves_map
   end
 
   def evaluate_board_position(board_code)
+    @moves_map ||= get_moves_map
     legal_moves_count = 0
 
     active_pieces, passive_pieces = split_pieces(board_code)
@@ -34,7 +29,7 @@ class GameGrammar
       destinations = @moves_map[piece]
 
       destinations.each do |destination|
-        legal_moves_count += 1 if valid?(destination, active_pieces + passive_pieces, enemy)
+        legal_moves_count += 1 if position_valid?(destination, active_pieces + passive_pieces, enemy)
       end
     end
 
@@ -58,7 +53,7 @@ class GameGrammar
     board_code
   end
 
-  def valid?(destination, pieces, enemy)
+  def position_valid?(destination, pieces, enemy)
     !occupied?(pieces, destination) && !threatened?(destination, enemy)
   end
 
@@ -106,9 +101,10 @@ class GameGrammar
     pieces.include?(destination)
   end
 
-  def get_letter(coords, position)
+  def get_letter(position)
+    @coords ||= get_ordered_coords
     base = 'a'.ord
-    index = coords.index(position)
+    index = @coords.index(position)
 
     return (base + index).chr
   end

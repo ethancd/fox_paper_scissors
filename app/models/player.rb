@@ -1,4 +1,5 @@
 class Player < ApplicationRecord
+  include AI
   belongs_to :game
   belongs_to :user
 
@@ -22,5 +23,13 @@ class Player < ApplicationRecord
 
   def color
     self.first ? "red" : "blue"
+  end
+
+  def async_move(game_id)
+    return nil unless ai?
+    puts "========ASYNC_MOVE~~~~~~~~~~========="
+    puts game_id
+    puts "========~~~~~~~~~~========="
+    Resque.enqueue(FindMove, game_id)
   end
 end
