@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
       @user = User.find_or_create_by(id: cookies[:user_id])
     else
       @user = User.create
+      cookies[:user_id] = @user.id
     end
   end
 end

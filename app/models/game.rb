@@ -1,13 +1,13 @@
 class Game < ApplicationRecord
-  has_many :players
+  has_many :players, dependent: :destroy
   has_many :users, through: :players
-  has_many :moves
-  has_one :board
-  has_one :chat
+  has_many :moves, dependent: :destroy
+  has_one :board, dependent: :destroy
+  has_one :chat, dependent: :destroy
 
   def create_players(user_id1, user_id2)
     users = [{user_id: user_id1}, {user_id: user_id2}];
-    users.shuffle
+    users.shuffle!
 
     users[0][:first] = true
     users[1][:first] = false

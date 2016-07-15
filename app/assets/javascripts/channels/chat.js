@@ -14,7 +14,7 @@ App.chat = App.cable.subscriptions.create("ChatChannel", {
         displayMessage(message);
         break;
       case "new_message":
-       displayMessage(buildMessage(data.message));
+       displayMessage(buildMessage(data));
        break;
     };
   }
@@ -32,7 +32,11 @@ var attachHandlers = function() {
 };
 
 var send = function () {
-  $.post('/chat', { "text": $(".chat textarea").val() });
+  $.post('/message', { 
+    "author_id": Cookies.get('user_id'),
+    "chat_id": $(".chat").attr("id"),
+    "text": $(".chat textarea").val()
+  });
 
   $(".chat textarea").val("");
 };
@@ -41,13 +45,13 @@ var displayMessage = function(messageNode) {
   $(".chat .messages").append(messageNode)
 }
 
-var buildMessage = function(text) {
+var buildMessage = function(data) {
   var $el = $("<li/>", {
     class: "message",
-    text: text
+    text: data.message
   });
 
-  //$el.css("color", data.color)
+  $el.css("color", data.color)
   return $el;
 };
 

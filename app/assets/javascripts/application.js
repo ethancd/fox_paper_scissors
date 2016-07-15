@@ -14,4 +14,5 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require turbolinks
+//= require js-cookie.js
 //= require_tree .

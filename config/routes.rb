@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   get ':controller(/:action(/:slug))'
 
-  match 'chat', to: 'chat#respond', via: [:post]
+  match 'message', to: 'message#create', via: [:post]
   match 'play/move', to: 'play#send_move', via: [:post]
 
   mount ActionCable.server => "/cable"

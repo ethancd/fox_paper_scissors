@@ -3,7 +3,7 @@ class ChatChannel < ApplicationCable::Channel
   def subscribed
     stream_from "messages"
 
-    ActionCable.server.broadcast "messages", {action: "user_joined", message: "#{self.user_name}" }
+    ActionCable.server.broadcast "messages", {action: "user_joined", message: "" }
   end
 
   def unsubscribed
