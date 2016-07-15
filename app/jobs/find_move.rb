@@ -6,13 +6,15 @@ class FindMove
     puts game_id
     puts "========~~~~~~~~~~========="
 
-    ActionCable.server.broadcast "messages", {action: "move", message: game_id }
+    game = Game.find(game_id)
+    ai = game.players.find { |player| player.ai? }
 
-    # game = Game.find(game_id)
-    # ai = game.players.find { |player| player.ai? }
+    delta = ai.move(game.board.position, ai.color)
 
-    # delta = ai.move(game.board, ai.color)
+    @move = game.moves.create!({delta: delta, player_id: ai.id })
 
-    # game.moves.create!({delta: delta, player_id: ai.id })
+    puts "========ITWORKEDMOTHERFUCKERS~~~~~~~~~~========="
+    puts @move.id
+    puts "========~~~~~~~~~~========="
   end
 end

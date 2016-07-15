@@ -1,80 +1,22 @@
 class GameNode
-  attr_reader :board, :next_mover_side, :causal_move, :code
+  include GameGrammar
 
-  def initialize(board, next_mover_side, causal_move = nil)
-    @board = board
-    @next_mover_side = next_mover_side
-    @causal_move = causal_move
-    # @code = get_code
+  attr_reader :game_position, :board_position, :next_mover_side, :causal_delta
+
+  def initialize(game_position, causal_delta = nil)
+    @game_position = game_position
+    @next_mover_side = get_side_from_initial(game_position[0])
+    @board_position = game_position[1..6]
+    @causal_delta = causal_delta
   end
-
-  # def get_code
-  #   #code is a 7-char string:
-  #   #1 bit for whose turn
-  #   #1 letter for each piece's location
-  #   #format: {turn}{shinyB}{shinyC}{shinyS}{dullB}{dullC}{dullS}
-  #   string = ""
-
-  #   string += next_mover_side == :shiny ? 's' : 'd'
-
-  #   [:shiny, :dull].each do |side|
-  #     [:grass, :fire, :water].each do |type|
-  #       piece = board.pieces.find { |p| p.type == type && p.owner == side }
-  #       string += get_letter_for_piece(piece)
-  #     end
-  #   end
-
-  #   return string
-  # end
-
-  # def get_letter_for_piece(piece)
-  #   return "z" if piece.nil?
-
-  #   get_letter_for_position(piece.pos)
-  # end
-
-  # def get_letter_for_position(pos)
-  #   base = 'a'.ord
-  #   ordered_coords_list = [
-  #     [0,0],
-  #     [0,2],
-  #     [0,4],
-  #     [0,6],
-  #     [1,1],
-  #     [1,3],
-  #     [1,5],
-  #     [2,0],
-  #     [2,2],
-  #     [2,4],
-  #     [2,6],
-  #     [3,1],
-  #     [3,3],
-  #     [3,5],
-  #     [4,0],
-  #     [4,2],
-  #     [4,4],
-  #     [4,6],
-  #     [5,1],
-  #     [5,3],
-  #     [5,5],
-  #     [6,0],
-  #     [6,2],
-  #     [6,4],
-  #     [6,6]
-  #   ]
-
-  #   index = ordered_coords_list.index(pos)
-
-  #   return (base + index).chr
-  # end
 
   def losing_node?(evaluator, depth)
     # if(!book[@code].nil? && !book[@code].is_a?(Array))
     #   return book[@code] == :losing
     # end
 
-    if board.over?    
-      verdict = board.winner != evaluator
+    if over?(@game_position)
+      verdict = winning_side(@game_position) != evaluator
       
       # book[@code] = :losing if verdict
       return verdict
@@ -103,8 +45,8 @@ class GameNode
     #   return book[@code] == :winning
     # end
 
-    if board.over?  
-      verdict = board.winner == evaluator
+    if over?(@game_position)
+      verdict = winning_side(@game_position) == evaluator
       
       # book[@code] = :winning if verdict
       return verdict
@@ -165,8 +107,8 @@ class GameNode
   # end
 
   def simple_score_node(side)
-    our_moves = @board.legal_moves(side).length
-    their_moves = @board.legal_moves(other_side(side)).length
+    our_moves = get_legal_move_count(@game_position)
+    their_moves = get_legal_move_count(swap_sides(@game_position))
 
     get_weighted_score(our_moves, their_moves)
   end
@@ -180,10 +122,9 @@ class GameNode
   def children
     children = []
 
-    board.legal_moves(self.next_mover_side).each do |move|
-      new_board = board.get_board_state_after_move(move)
-      next_mover_side = other_side(self.next_mover_side)
-      children << GameNode.new(new_board, next_mover_side, move)
+    get_legal_deltas(@game_position).each do |delta|
+      position = apply_delta_to_position(@game_position, delta)
+      children << GameNode.new(position, delta)
     end
 
     children

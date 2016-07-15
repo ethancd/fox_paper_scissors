@@ -3,24 +3,18 @@ module AI
 
   attr_accessor :random
 
-  def move(board, side)
-    if @random
-      move = random_move(board, side)
+  def move(board_position, side)
+    if true
+      random_move(board_position, side)
     else
-      move = timed_move(board, side)
+      timed_move(board_position, side)
     end
-
-    get_delta(move)
   end
 
-  def get_delta(move)
-    get_letter(move.piece.position) + "_" + get_letter(move.target)
-  end
-
-  def timed_move(board, side)
+  def timed_move(board_position, side)
     puts "Thinking..."
 
-    node = GameNode.new(board, side) 
+    node = GameNode.new(board_position, side) 
     possible_moves = node.children.shuffle
     depth = 3
     deepest_move = possible_moves.sample.causal_move
@@ -48,19 +42,19 @@ module AI
     return deepest_move
   end
 
-  def random_move(board, side)
-    node = GameNode.new(board, side) 
-    possible_moves = node.children.shuffle;
+  def random_move(board_position, side)
+    node = GameNode.new(side[0] + board_position) 
+    possible_nodes = node.children.shuffle;
 
-    new_node = find_checkmate_move(possible_moves, side)
+    new_node = find_checkmate_move(possible_nodes, side)
     if new_node
-      return new_node.causal_move
+      return new_node.causal_delta
     end
 
-    return possible_moves.sample.causal_move
+    return possible_nodes.sample.causal_delta
   end
 
-  def find_move(possible_moves, side, depth)
+  def find_move(possible_nodes, side, depth)
     node = find_checkmate_move(possible_moves, side)
     return EvaluatedMove.new(node.causal_move, :winning) if node
 
@@ -74,25 +68,21 @@ module AI
     return EvaluatedMove.new(node.causal_move)
   end
 
-  def find_checkmate_move(possible_moves, side)
-    possible_moves.find{ |child| child.board.is_in_checkmate?(other_side(side))}
+  def find_checkmate_move(possible_nodes, side)
+    possible_nodes.find{ |child| winning_side(child.game_position)}
   end
 
-  def find_winning_move(possible_moves, side, depth)
-    possible_moves.find{ |child| child.winning_node?(side, depth) }
+  def find_winning_move(possible_nodes, side, depth)
+    possible_nodes.find{ |child| child.winning_node?(side, depth) }
   end
 
-  def find_all_non_losing_moves(possible_moves, side, depth)
-    possible_moves.find_all { |child| !child.losing_node?(side, depth) }
+  def find_all_non_losing_moves(possible_nodes, side, depth)
+    possible_nodes.find_all { |child| !child.losing_node?(side, depth) }
   end
 
-  def find_minimax_move(possible_moves, side, depth)
-    possible_moves.max_by do |child| 
+  def find_minimax_move(possible_nodes, side, depth)
+    possible_nodes.max_by do |child| 
       child.simple_score_node(side)
     end
-  end
-
-  def other_side(side)
-    side == "red" ? "blue" : "red"
   end
 end

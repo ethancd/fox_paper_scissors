@@ -172,6 +172,10 @@ var generatePieces = function() {
     [6, 4]
   ];
 
+  if (Pieces.length) {
+    Pieces = [];
+  }
+  
   for (var i = 0; i < colors.length; i++) {
     for (var j = 0; j < types.length; j++) {
       var piece = new Piece(colors[i], types[j], positions[i*3 + j]).initialize();

@@ -1,42 +1,73 @@
 module GameGrammar
 
-  def get_moves_map
+  def moves_map
+    @moves_map ||= get_moves_map
+  end
+
+  def coords
     @coords ||= get_ordered_coords
-    board = Board.new()
+  end
+
+  def get_moves_map
     moves_map = Hash.new()
 
-    @coords.each do |coord|
-      destinations = board.adjacent_spaces(coord)
+    self.coords.each do |coord|
+      destinations = adjacent_spaces(coord)
       moves_map[get_letter(coord)] = destinations.map { |dest| get_letter(dest) }
     end
 
     return moves_map
   end
 
-  def evaluate_board_position(board_code)
-    @moves_map ||= get_moves_map
-    legal_moves_count = 0
+  def get_legal_move_count(game_position)
+    legal_moves = get_legal_deltas(game_position)
+    return nil if legal_moves == nil
 
-    active_pieces, passive_pieces = split_pieces(board_code)
+    legal_moves.length
+  end
+
+  def get_legal_deltas(game_position)
+    return nil if illegal_position?(game_position)
+
+    legal_deltas = []
+
+    active_pieces, passive_pieces = split_pieces(game_position)
     enemy_map = get_enemy_map(active_pieces, passive_pieces)
-
-    return nil if illegal_position?(active_pieces, passive_pieces, enemy_map)
 
     mobile_pieces = get_mobile_pieces(active_pieces, enemy_map)
 
     mobile_pieces.each do |piece|
       enemy = enemy_map[piece]
-      destinations = @moves_map[piece]
+      destinations = self.moves_map[piece]
 
       destinations.each do |destination|
-        legal_moves_count += 1 if position_valid?(destination, active_pieces + passive_pieces, enemy)
+        if target_valid?(destination, active_pieces + passive_pieces, enemy)
+          legal_deltas.push("#{piece}_#{destination}")
+        end
       end
     end
 
-    legal_moves_count
+    legal_deltas
   end
 
-  def illegal_position?(active_pieces, passive_pieces, active_enemy_map)
+  def apply_delta_to_position(game_position, delta)
+    side_initial = game_position[0]
+    board_position = game_position[1..-1]
+
+    next_board_position = board_position.gsub(delta[0], delta[-1])
+    next_game_position = side_initial + next_board_position
+
+    swap_sides(next_game_position)
+  end
+
+  def get_delta(piece, target)
+    [piece, target].each { |position| position.map!(&:to_i) }
+    "#{get_letter(piece)}_#{get_letter(target)}"
+  end
+
+  def illegal_position?(game_position)
+    active_pieces, passive_pieces = split_pieces(game_position)
+    active_enemy_map = get_enemy_map(active_pieces, passive_pieces)
     passive_enemy_map = get_enemy_map(passive_pieces, active_pieces)
 
     active_threatened_pieces = get_threatened_pieces(active_pieces, active_enemy_map)
@@ -47,19 +78,19 @@ module GameGrammar
     return illegal
   end
 
-  def swap_sides(board_code)
-    board_code[0] = (board_code[0] == "r") ? "b" : "r"
+  def swap_sides(game_position)
+    game_position[0] = other_side(game_position[0])
 
-    board_code
+    game_position
   end
 
-  def position_valid?(destination, pieces, enemy)
+  def target_valid?(destination, pieces, enemy)
     !occupied?(pieces, destination) && !threatened?(destination, enemy)
   end
 
-  def split_pieces(board_code)
-    side = board_code[0]
-    pieces = board_code.split('')[1..6]
+  def split_pieces(game_position)
+    side = game_position[0]
+    pieces = game_position.split('')[1..6]
 
     if side == "r"
       return pieces[0..2], pieces[3..5]
@@ -94,7 +125,7 @@ module GameGrammar
   end
 
   def threatened?(piece, enemy)
-    @moves_map[enemy].include?(piece)
+    self.moves_map[enemy].include?(piece)
   end
 
   def occupied?(pieces, destination)
@@ -102,9 +133,8 @@ module GameGrammar
   end
 
   def get_letter(position)
-    @coords ||= get_ordered_coords
     base = 'a'.ord
-    index = @coords.index(position)
+    index = self.coords.index(position)
 
     return (base + index).chr
   end
@@ -138,96 +168,62 @@ module GameGrammar
       [6,6]
     ]
   end
+
+  def other_side(side)
+    case side
+      when "red", "r"
+        "blue"
+      when "blue", "b"
+        "red"
+    end
+  end
+
+  def over?(game_position)
+    return nil if illegal_position?(game_position)
+
+    get_legal_move_count(game_position) == 0
+  end
+
+  def winning_side(game_position)
+    return nil unless over?(game_position)
+
+    [game_position, swap_sides(game_position)].each do |position|
+      if get_legal_move_count(position) != 0
+        return get_side_from_initial(position[0]) 
+      end
+    end
+  end
+
+  def get_side_from_initial(initial)
+    case initial
+      when "r"
+        "red"
+      when "b"
+        "blue"
+    end
+  end
+
+  def adjacent_spaces(pos)
+    spaces = []
+
+    for i in (pos[0] - 2)..(pos[0] + 2)
+      for j in (pos[1] - 2)..(pos[1] + 2)
+        if is_on_grid?([i,j]) && is_adjacent?(pos, [i,j])
+          spaces.push([i,j])
+        end
+      end
+    end
+
+    spaces
+  end
+
+  def is_on_grid?(pos)
+    pos[0].between?(0,6) && 
+    pos[1].between?(0,6) && 
+    pos[0] % 2 == pos[1] % 2
+  end
+
+  def is_adjacent?(pos1, pos2)
+    (pos1[0] - pos2[0]).abs + (pos1[1] - pos2[1]).abs == 2
+  end
 end
-
-
-# if __FILE__ == $PROGRAM_NAME
-#   puts "Test the grammar"
-
-#   grammar = GameGrammar.new
-
-#   test_positions = [
-#     "rabcdgi",
-#     "babcdgi",
-#     "rabcdgj",
-#     "babcdgj",
-#     "rabcdgk",
-#     "babcdgk",
-#     "rabcdgl",
-#     "babcdgl",
-#     "rabcdgm",
-#     "babcdgm",
-#     "rabcdgn",
-#     "babcdgn",
-#     "rabcdgo",
-#     "babcdgo",
-#     "rabcdgp",
-#     "babcdgp",
-#     "rabcdgq",
-#     "babcdgq",
-#     "rabcdgr",
-#     "babcdgr",
-#     "rabcdgs",
-#     "babcdgs",
-#     "rabcdgt",
-#     "babcdgt",
-#     "rabcdgu",
-#     "babcdgu",
-#     "rabcdgv",
-#     "babcdgv",
-#     "rabcdgw",
-#     "babcdgw",
-#     "rabcdgx",
-#     "babcdgx",
-#     "rabcdgy",
-#     "babcdgy",
-#     "rabcdhe",
-#     "babcdhe"
-#   ]
-
-
-#   expected_outcomes = [
-#     0,
-#     2,
-#     1,
-#     2,
-#     2,
-#     1,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     1,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     2,
-#     0,
-#     3
-#   ]
-
-#   test_positions.each_with_index do |code, i|
-#     expected = expected_outcomes[i]
-#     actual = grammar.evaluate_board_position(code)
-#     puts "#{expected} vs. #{actual}"
-#   end
-# end
