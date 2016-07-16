@@ -25,25 +25,34 @@ var Board = function(){
       return;
     }
 
+    var piece = data.piece;
+
+    if(!piece.isMobile()) {
+      return;
+    }
+
+    var enemy = piece.getEnemy();
+
     $('.node').each(function(i, el) {
       if ($(el).children().length) {
         return;
       }
 
       var coords = $(el).attr("id").match(/\d/g);
-      var adjacent = this.isAdjacent(coords, data.position);
+      var adjacent = isAdjacent(coords, piece.position);
+      var threatened = isAdjacent(coords, enemy.position);
 
-      if(adjacent) {
+      if(adjacent && !threatened) {
         $(el).addClass("highlighted");
       }
     }.bind(this));
 
   };
-
-  this.isAdjacent = function(pos1, pos2) {
-    return 2 == (Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]))
-  }
 };
+
+var isAdjacent = function(pos1, pos2) {
+  return 2 == (Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]))
+}
 
 
 $(document).on('turbolinks:load', function() {

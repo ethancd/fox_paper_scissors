@@ -17,6 +17,12 @@ var Piece = function(color, type, position){
     return this;
   };
 
+  this.enemyMap = {
+    "rock": "paper",
+    "paper": "scissors",
+    "scissors": "rock"
+  };
+
   this.attachHandlers = function() {
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
@@ -27,15 +33,15 @@ var Piece = function(color, type, position){
     }.bind(this));
   };
 
-  this.highlight = function() {
-    if (!this.matchesTurnColor(this.$el, $('.turn-tracker'))) {
+  this.highlight = function(skipValidation) {
+    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-tracker'))) {
       return;
     }
     this.$el.toggleClass("highlighted")
     $('.piece').not(this.$el).removeClass("highlighted");
 
     BoardListener.send("piece.clicked", {
-      position: this.position,
+      piece: this,
       active: this.$el.hasClass("highlighted")
     });
   };
@@ -77,14 +83,17 @@ var Piece = function(color, type, position){
         });
 
         piece.highlight();
-
-        setTimeout(function() {
-          piece.movePiece(response.move.target);
-          $('.node').removeClass("highlighted");
-        }, 1000);
+        piece.delayedMove(response.move.target, 1000);
       }
     }.bind(this));
-  }
+  };
+
+  this.delayedMove = function (target, tick) {
+    setTimeout(function() {
+      this.movePiece(target);
+      $('.node').removeClass("highlighted");
+    }.bind(this), tick);
+  };
 
   this.movePiece = function(target) {
     if (!this.$el.hasClass("highlighted")) {
@@ -136,7 +145,42 @@ var Piece = function(color, type, position){
       type: this.type,
       color: this.color
     };
-  }
+  };
+
+  this.isMobile = function () {
+    var threatenedPieces = getThreatenedPieces(this.color);
+
+    if (!threatenedPieces.length) {
+      return true;
+    }
+
+    if (threatenedPieces.length == 1 && this.isThreatened()) {
+      return true;
+    }
+
+    return false;
+  };
+
+  this.isThreatened = function () {
+    var enemy = this.getEnemy();
+
+    return isAdjacent(this.position, enemy.position);
+  };
+
+  this.getEnemy = function () {
+    var enemyColor = this.color === "red" ? "blue" : "red";
+    var enemyType = this.enemyMap[this.type];
+
+    return Pieces.find(function(piece) {
+      return piece.color == enemyColor && piece.type == enemyType;
+    });
+  };
+};
+
+var getThreatenedPieces = function (activeColor) {
+  return $.grep(Pieces, function(piece) {
+    return piece.color === activeColor && piece.isThreatened();
+  });
 };
 
 var getPosition = function(node) {

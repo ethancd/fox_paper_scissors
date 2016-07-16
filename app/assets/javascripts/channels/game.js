@@ -1,7 +1,7 @@
-var subscribe = function () {
+var subscribe = function (slug) {
   App.game = App.cable.subscriptions.create({
       channel: "GameChannel",
-      game_slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0]
+      game_slug: slug
     }, {
     connected: function() {
       //Called when the subscription is ready for use on the server
@@ -38,7 +38,16 @@ var subscribe = function () {
   });
 }
 
+var getSlug = function() {
+  var match = window.location.pathname.match(/[0-9|a-f]{8}/);
+
+  return match && match[0];
+};
+
 
 $(document).on('turbolinks:load', function() {
-  subscribe();
+  var slug = getSlug();
+  if (slug) {
+    subscribe(slug);
+  }
 });

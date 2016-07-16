@@ -14,3 +14,8 @@
 </div>
 
 <div class="splash-image"></div>
+
+<%= javascript_tag do %>
+    var Pieces = <%= @board.nil? ? [] : @board.pieces.to_json.html_safe %>;
+    var startingPosition = "<%= @board.nil? ? "" : @board.position %>";
+<% end %>
