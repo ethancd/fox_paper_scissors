@@ -2,28 +2,62 @@
 
 .timer {
   position: relative;
-  width: 225px;
+  z-index: 1;
+  width: 123px;
   height: 100%;
-  color: $timer-text-color;
-  background-color: $timer-color;
+  border: 1px solid #000;
+  border-radius: 20px;
+  box-shadow: 1px 1px 2px #777;
+  background-color: rgba(0,0,0, 0.10);
 
   .turn-tracker {
     position: absolute;
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
+    width: 0; 
+    height: 0; 
     margin: auto;
     left: 0;
     right: 0;
 
     &.red {
       top: 50px;
-      background-color: red;
+
+      //triangle-up
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 50px solid red;
+
+      &:before {
+        position: relative;
+        z-index: -1;
+        right: 33px;
+        bottom: 3px;
+        content: "";
+        display: table;
+        border-left: 33px solid transparent;
+        border-right: 33px solid transparent;
+        border-bottom: 55px solid #000;
+      }
     }
 
     &.blue {
       bottom: 50px;
-      background-color: blue;
+
+      //triangle down
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-top: 50px solid blue;
+
+      &:before {
+        position: relative;
+        z-index: -1;
+        right: 33px;
+        bottom: 52px;
+        content: "";
+        display: table;
+        border-left: 33px solid transparent;
+        border-right: 33px solid transparent;
+        border-top: 55px solid #000;
+      }
     }
   }
 }

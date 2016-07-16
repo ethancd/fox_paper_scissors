@@ -1,38 +1,55 @@
 @import 'variables';
 
 .chat {
-  width: 225px;
+  width: 223px;
   height: 100%;
-  background-color: $chat-color;
+  background-color: rgba(0, 0, 0, .10);
+  box-shadow: 1px 1px 2px #333;
+  border: 1px solid #000;
+  border-radius: 0 0 10px 10px;
   font-size: 16px;
 
   .messages {
     height: 80%;
     margin: 2px;
-    background-color: $chat-messages-color;
+    background-color: rgba(255, 255, 255, .20);
     overflow: auto;
     font-family: 'Open Sans', sans-serif;
 
     .message {
       width: 100%;
       margin: 5px 1px 1px 1px;
-      color: $chat-text-color;
+      color: #333;
     }
   }
 
   textarea {
-    width: calc(100% - 10px);
+    width: 213px;
     height: 32px;
     margin: 5px;
     padding: 0;
-    border: 0;
-    background-color: $chat-messages-color;
+
+    border: 1px solid #000;
+    overflow: auto;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    resize: none;
+
+    background-color: #eee;
     font-family: 'Open Sans', sans-serif;
   }
 
   button {
-    background-color: orange;
+    cursor: pointer;
+    background-color: #f50;
+    border: 2px solid darken(#f50, 20%);
+    border-radius: 8px;
+    margin-right: 5px;
     float: right;
+    font-size: 16px;
     font-family: 'Open Sans', sans-serif;
   }
 }

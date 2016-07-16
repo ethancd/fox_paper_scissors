@@ -109,7 +109,7 @@ module NameGenerator
 
     def animal_names
       [
-        "aardvark",
+       "aardvark",
        "alligator",
        "alpaca",
        "ant",
