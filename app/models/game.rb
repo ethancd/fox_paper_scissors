@@ -5,14 +5,14 @@ class Game < ApplicationRecord
   has_one :board, dependent: :destroy
   has_one :chat, dependent: :destroy
 
-  def shuffle_player_order
-    players = self.players.shuffle
-    players[0][:first] = true
-    players[1][:first] = false
+  # def shuffle_player_order
+  #   players = self.players.shuffle
+  #   players[0][:first] = true
+  #   players[1][:first] = false
 
-    self.players = players
-    self.save
-  end
+  #   self.players = players
+  #   self.save
+  # end
 
   def broadcast_position_update(color)
     ActionCable.server.broadcast "game_#{self.slug}", {

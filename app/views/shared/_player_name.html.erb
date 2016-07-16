@@ -1,7 +1,7 @@
-<% color = player.nil? ? "gray" : player.color %>
+<% side = player.nil? ? "waiting" : player.color %>
 <% user_name = player.nil? ? "waiting for opponent" : player.user_name %>
-<% noun = player.nil? ? "..." : player.get_noun(user) %>
+<% noun = player.nil? ? "..." : player.get_noun(user.id) %>
 
-<h3 class="player-name <%= color %>">
+<h3 class="player-name <%= side %>">
   <%= user_name %> (<%= noun %>)
 </h3>

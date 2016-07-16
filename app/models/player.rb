@@ -7,10 +7,10 @@ class Player < ApplicationRecord
   
   COMPUTER_PLAYER_USER_ID = "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
 
-  def get_noun(user)
+  def get_noun(user_id)
     return "AI" if ai?
 
-    self.user_id == user.id ? "You" : "Them"
+    self.user_id == user_id ? "You" : "Them"
   end
 
   def user_name
@@ -23,5 +23,14 @@ class Player < ApplicationRecord
 
   def color
     self.first ? "red" : "blue"
+  end
+
+  def as_json(options = {})
+    result = super(options)
+    result[:color] = color
+    result[:user_name] = user_name
+    result[:noun] = get_noun(options[:user_id])
+
+    result
   end
 end

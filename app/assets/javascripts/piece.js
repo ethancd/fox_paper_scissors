@@ -21,7 +21,7 @@ var Piece = function(color, type, position){
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
     this.$el.on('click', function() {
-      if (player.first ? this.color === "red" : this.color === "blue") {
+      if (current_player.first ? this.color === "red" : this.color === "blue") {
         this.highlight()
       }
     }.bind(this));
@@ -109,21 +109,11 @@ var Piece = function(color, type, position){
   this.moveToPosition = function() {
     var $target = $('.node').filter(function(i, el) {
       var coords = getPosition($(el));
-      return this.isSameSpace(this.position, coords);
+      return isSameSpace(this.position, coords);
     }.bind(this))
 
     this.$el.detach();
     $target.append(this.$el);
-  };
-
-  this.isSameSpace = function(pos1, pos2) {
-    for (var i = 0; i < pos1.length; i++) {
-      if (parseInt(pos1[i]) !== parseInt(pos2[i])) {
-        return false;
-      }
-    }
-
-    return true;
   };
 
   this.resetPiece = function() {
@@ -214,6 +204,30 @@ var getCoords = function(letter) {
   ];
 
   return coords[index];
+}
+
+var isSameSpace = function(pos1, pos2) {
+  for (var i = 0; i < pos1.length; i++) {
+    if (parseInt(pos1[i]) !== parseInt(pos2[i])) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+var createHtmlPieces = function() {
+  for (var i = 0; i < Pieces.length; i++) {
+    var pieceData = Pieces[i]
+    var $pieceEl = $("<div>", {"class": "piece " + pieceData.color + " " + pieceData.type });
+    
+    var $target = $('.node').filter(function(i, el) {
+      var coords = getPosition($(el));
+      return isSameSpace(pieceData.position, coords);
+    }.bind(this))
+
+    $target.append($pieceEl);
+  }
 }
 
 

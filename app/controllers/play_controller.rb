@@ -27,14 +27,11 @@ class PlayController < ApplicationController
     end
 
     if @game.players.length == 0 
-      puts "==========NO PLAYERS YET =========="
       @game.players.create({user_id: @user.id, first: true})
       @game.create_chat
       @game.save
     elsif @game.players.length == 1 && @game.players[0].user_id != @user.id
-      puts "==========ONE PLAYER SO FAR HERE WE GOOOO =========="
-      @game.players.create({user_id: @user.id})
-      @game.shuffle_player_order
+      @game.players.create({user_id: @user.id, first: false})
       @game.create_board
       @game.save
     end
@@ -77,8 +74,7 @@ class PlayController < ApplicationController
     end
 
     def build_game(user_id1, user_id2)
-      @game.players.new([{user_id: user_id1}, {user_id: user_id2}])
-      @game.shuffle_player_order
+      @game.players.new([{user_id: user_id1, first: true}, {user_id: user_id2, first: false}])
 
       @game.create_chat
       @game.create_board

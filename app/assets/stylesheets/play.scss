@@ -26,14 +26,34 @@
 
   &.red {
     color: #c00;
+
+    $red-shadow-color: darken(#c00, 25%);
+    text-shadow:
+     -1px -1px 0 $red-shadow-color,  
+      1px -1px 0 $red-shadow-color,
+      -1px 1px 0 $red-shadow-color,
+       1px 1px 0 $red-shadow-color;
   }
 
   &.blue {
     color: #00c;
+    $blue-shadow-color: darken(#00c, 25%);
+    text-shadow:
+     -1px -1px 0 $blue-shadow-color,  
+      1px -1px 0 $blue-shadow-color,
+      -1px 1px 0 $blue-shadow-color,
+       1px 1px 0 $blue-shadow-color;
   }
 
   &.gray {
     color: #333;
+
+    $gray-shadow-color: #000;
+    text-shadow:
+     -1px -1px 0 $gray-shadow-color,  
+      1px -1px 0 $gray-shadow-color,
+      -1px 1px 0 $gray-shadow-color,
+       1px 1px 0 $gray-shadow-color;
   }
 }
 
