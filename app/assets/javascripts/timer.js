@@ -1,16 +1,11 @@
 var Timer = function (){
   this.initialize = function() {
     this.turnTrackerEl = $('.turn-tracker');
-    this.startTurnTracker();
+
     BoardListener.listen("piece.moved", this.toggleTurnTracker.bind(this));
     BoardListener.listen("position.updated", this.toggleTurnTracker.bind(this));
     BoardListener.listen("piece.unmoved", this.resetTurnTracker.bind(this));
-    BoardListener.listen("reset", this.startTurnTracker.bind(this));
   };
-
-  this.startTurnTracker = function () {
-    this.toggleTurnTracker({color: "blue"});
-  }
   
   this.toggleTurnTracker = function(data) {
     this.turnTrackerEl.removeClass(data.color);

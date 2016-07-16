@@ -7,7 +7,7 @@
   </div>
 
   <div class="tutorial-area">
-    <%= render "shared/board" %>
+    <%= render partial: "shared/board", locals: { board: @board } %>
   </div>
 
   <p class="site-description"><strong>Fox Paper Scissors</strong> is an original game that combines the <a href="https://en.wikipedia.org/wiki/Nontransitive_game">non-transitivity</a> of Rock Paper Scissors with the chasing mechanics of traditional <a href="https://en.wikipedia.org/wiki/Fox_games">fox games</a>.</p>

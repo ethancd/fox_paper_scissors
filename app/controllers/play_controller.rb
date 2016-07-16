@@ -12,6 +12,10 @@ class PlayController < ApplicationController
       @game = build_game(@user.id, Player::COMPUTER_PLAYER_USER_ID)
     end
 
+    if @game.is_ai_turn?
+      FindMove.set(wait: 3.seconds).perform_later(@game)
+    end
+
     render "index"
   end
 
