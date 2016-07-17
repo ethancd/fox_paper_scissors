@@ -19,9 +19,10 @@
       width: 100%;
 
       .node {
-        background-color: #beaea7;
-      }
-    }
+        background-color: #a5a0a9;
+      }///warm-brown = beaea7
+    }///cool-gray = 8c92ac
+    ///avg = a5a0a9
 
     &.short {
       width: 70%;
@@ -29,7 +30,7 @@
       margin-left: auto;
 
       .node {
-        background-color: darken(#beaea7, 30%);
+        background-color: darken(#a5a0a9, 30%);
       }
     }
 
