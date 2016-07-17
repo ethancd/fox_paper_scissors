@@ -1,8 +1,9 @@
 @import 'variables';
 
 .container {
+  position: relative;
   width: 350px;
-  margin: auto;
+  margin: 25px auto;
   border: 1px solid #000;
   border-radius: 20px;
   box-shadow: 3px 3px 5px #333;
@@ -10,11 +11,22 @@
 }
 
 .site-title {
-  margin: 15px 0 25px 0;
-  font-size: 72px;
+  position: absolute;
+  top: 0;
+  left: -300px;
+  font-size: 84px;
   text-align: center;
-  color: #222;
-  font-family: 'Arvo', serif;
+  line-height: .85;
+  color: #000;
+  font-family: 'Signika', serif;
+
+
+  $white-shadow-color: #fff;
+  text-shadow:
+    // -1px -1px 0px $white-shadow-color,  
+    //  1px -1px 0px $white-shadow-color,
+    // -1px 1px 0px $white-shadow-color,
+     1px 1px 5px $white-shadow-color;
 }
 
 .site-description {
@@ -45,6 +57,39 @@
   .board {
     transform: scale((2 / 3));
     transform-origin: 0 0;
+  }
+}
+
+.tutorial-messages {
+  position: absolute;
+  bottom: 0;
+  right: -295px;
+  width: 280px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, .20);
+  box-shadow: 1px 1px 2px #333;
+  border: 1px solid #000;
+  border-radius: 10px;
+  font-size: 16px;
+  overflow: scroll;
+  font-family: 'Open Sans', sans-serif;
+
+  .message {
+    width: 100%;
+    margin: 5px 5px 0 5px;
+    color: #000;
+
+    span {
+      font-weight: bold;
+    }
+
+    .red {
+      color: #c00;
+    }
+
+    .blue {
+      color: #00c;
+    }
   }
 }
 
