@@ -1,4 +1,4 @@
-var subscribe = function (slug) {
+var gameSubscribe = function (slug) {
   App.game = App.cable.subscriptions.create({
       channel: "GameChannel",
       game_slug: slug
@@ -16,7 +16,18 @@ var subscribe = function (slug) {
         case "player_joined_game":
           var new_player = JSON.parse(data.player);
 
-          if(current_player.user_id == new_player.user_id) {
+          if(!new_player) {
+            return;
+          }
+
+          if(current_player && current_player.user_id == new_player.user_id) {
+
+            if($('.player-name.waiting').length) {
+              displayMessage(buildMessage({
+                message: "Share this page's url with a friend to start playing: " + window.location
+              }));
+            }
+
             return;
           }
 
@@ -44,10 +55,9 @@ var getSlug = function() {
   return match && match[0];
 };
 
-
 $(document).on('turbolinks:load', function() {
   var slug = getSlug();
   if (slug) {
-    subscribe(slug);
+    gameSubscribe(slug);
   }
 });

@@ -43,13 +43,13 @@
   }
 
   button {
-    cursor: pointer;
+    float: right;
+    margin-right: 5px;
     background-color: #f50;
     border: 2px solid darken(#f50, 20%);
     border-radius: 8px;
-    margin-right: 5px;
-    float: right;
     font-size: 16px;
     font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
   }
 }

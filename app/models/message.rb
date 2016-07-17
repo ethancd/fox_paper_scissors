@@ -11,23 +11,16 @@ class Message < ApplicationRecord
     if !player.nil? 
       player.color == "red" ? colors[:red] : colors[:blue]
     else
-      #make colors persist for a non-player user in a given chat room
-      return colors.values[2..-1].sample
+      return colors[:default]
     end
   end
 
-  private
-    def colors
-      {
-        red: "#85200c",
-        blue: "#1c4586",
-        orange: "#b4f506",
-        yellow: "#bf9000",
-        green: "#38761d",
-        violet: "#351c75",
-        rose: "#741b47",
-        black: "#000000",
-        gray: "#666666"
-      }
-    end
+    private
+      def colors
+        {
+          red: "#85200c",
+          blue: "#1c4586",
+          default: "#38761d",
+        }
+      end
 end

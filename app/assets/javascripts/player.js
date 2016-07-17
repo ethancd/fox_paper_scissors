@@ -8,5 +8,9 @@ var setPlayerName = function(new_player) {
   $el.text("");
 
   $el.addClass(new_player.color)
-  $el.text(new_player.user_name + " (" + new_player.noun + ")");
+  $el.text(new_player.user_name + " (" + getNoun(new_player) + ")");
+};
+
+var getNoun = function(player) {
+  return (current_player && current_player.user_id === player.user_id) ? "You" : "Them";
 };

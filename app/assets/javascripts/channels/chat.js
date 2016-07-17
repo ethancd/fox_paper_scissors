@@ -33,7 +33,7 @@ var buildMessage = function(data) {
   return $el;
 };
 
-var subscribe = function() {
+var chatSubscribe = function() {
   App.chat = App.cable.subscriptions.create({
       channel: "ChatChannel",
       chat_id: $(".chat").attr('id')
@@ -62,5 +62,5 @@ var subscribe = function() {
 
 $(document).on('turbolinks:load', function() {
   attachHandlers();
-  subscribe();
+  chatSubscribe();
 });

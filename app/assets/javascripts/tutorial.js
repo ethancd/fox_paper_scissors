@@ -4,7 +4,7 @@ var runTutorial = function(exampleGames) {
   var gameCounter = 0;
   var moveCounter = 0;
 
-  displayMessage(buildMessage("<span>Demo Game 1:</span>"));
+  displayTutorialMessage(buildTutorialMessage("<span>Demo Game 1:</span>"));
 
   setTimeout(function() {
     tickTutorial(exampleGames, gameCounter, moveCounter);
@@ -27,12 +27,12 @@ var tickTutorial = function (exampleGames, gameCounter, moveCounter) {
 
     setTimeout(function() {
       setPiecesToPosition(startingPosition)
-      displayMessage(buildMessage("<span>Demo Game " + (gameCounter + 1) + ":</span>"));
+      displayTutorialMessage(buildTutorialMessage("<span>Demo Game " + (gameCounter + 1) + ":</span>"));
 
       setTimeout(function() {
         tickTutorial(exampleGames, gameCounter, moveCounter);
       }, tickMs)
-    }, tickMs)
+    }, tickMs * 2)
   } else {
     setTimeout(function() {
       tickTutorial(exampleGames, gameCounter, moveCounter);
@@ -59,19 +59,19 @@ var publishTutorialMessage = function(message) {
   if(!message) {
     return;
   }
-  var messageNode = buildMessage(message);
+  var messageNode = buildTutorialMessage(message);
 
   setTimeout(function() {
-    displayMessage(messageNode);
+    displayTutorialMessage(messageNode);
   }, tickMs / 3);
 };
 
-var displayMessage = function(messageNode) {
+var displayTutorialMessage = function(messageNode) {
   $(".tutorial-messages").append(messageNode)
   $(".tutorial-messages").animate({scrollTop: $('.tutorial-messages').prop("scrollHeight")}, 500)
 }
 
-var buildMessage = function(message) {
+var buildTutorialMessage = function(message) {
   var $el = $("<li/>", {
     class: "message"
   });
