@@ -27,6 +27,7 @@ var Piece = function(color, type, position){
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
     BoardListener.listen("check.threatened", this.checkThreatened.bind(this));
+    BoardListener.listen("position.updated", this.checkThreatened.bind(this));
 
     this.$el.on('click', function() {
       if (current_player && (current_player.first ? this.color === "red" : this.color === "blue")) {
