@@ -26,6 +26,8 @@ var Piece = function(color, type, position){
   this.attachHandlers = function() {
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
+    BoardListener.listen("check.threatened", this.checkThreatened.bind(this));
+
     this.$el.on('click', function() {
       if (current_player && (current_player.first ? this.color === "red" : this.color === "blue")) {
         this.highlight()
@@ -123,6 +125,8 @@ var Piece = function(color, type, position){
 
     this.$el.detach();
     $target.append(this.$el);
+
+    BoardListener.send("check.threatened");
   };
 
   this.resetPiece = function() {
@@ -160,6 +164,10 @@ var Piece = function(color, type, position){
 
     return false;
   };
+
+  this.checkThreatened = function () {
+    this.$el.toggleClass("threatened", this.isThreatened());
+  }
 
   this.isThreatened = function () {
     var enemy = this.getEnemy();
