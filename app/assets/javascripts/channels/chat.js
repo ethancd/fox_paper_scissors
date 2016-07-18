@@ -1,4 +1,4 @@
-var attachHandlers = function() {
+var attachChatHandlers = function() {
   $(".chat textarea").on('keypress', function(event) {
     if(event.which == 13) {
       send();
@@ -6,10 +6,14 @@ var attachHandlers = function() {
     }
   });
 
-  $(".chat button").on('click', send);
+  $(".chat button.send").on('click', send);
 };
 
 var send = function () {
+  if (!$(".chat textarea").val().trim()) {
+    return;
+  }
+  
   $.post('/message', { 
     "author_id": Cookies.get('user_id'),
     "chat_id": $(".chat").attr("id"),
@@ -64,6 +68,6 @@ var chatSubscribe = function() {
 }
 
 $(document).on('turbolinks:load', function() {
-  attachHandlers();
+  attachChatHandlers();
   chatSubscribe();
 });

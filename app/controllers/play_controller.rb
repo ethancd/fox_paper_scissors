@@ -47,8 +47,7 @@ class PlayController < ApplicationController
     @move.delta = @move.get_delta(params[:move][:piece], params[:move][:target])
     @move.save
 
-    opponent = @game.players.find { |player| player.user_id != @user.id }
-    if opponent.ai?
+    if @game.with_ai?
       FindMove.perform_later(@game)
       #ai_move
     end
@@ -61,41 +60,67 @@ class PlayController < ApplicationController
     @game.moves.delete_all
     @game.board.reset_board
     @game.swap_player_order
+    @game.players.each do |player|
+      player.draws_considered = []
+      player.save
+    end
 
     @game.board.save
     @game.save
 
     @game.broadcast_new_game
 
-    first_player = @game.players.find { |player| player.first }
-    if first_player.ai?
+    ai = find_ai
+    if ai.first
       FindMove.perform_later(@game)
       #ai_move
     end
   end
 
   def offer_draw
+    @game = Game.find_by({slug: params[:slug] })
+
     ActionCable.server.broadcast "game_#{params[:slug]}", {
       action: "draw_offered",
       offerer_name: @user.name,
       offerer_id: @user.id
     }
+
+    if @game.with_ai?
+      ai_respond_to_draw_offer
+    end
   end
 
   def accept_draw
-    ActionCable.server.broadcast "game_#{params[:slug]}", {
-      action: "draw_accepted"
-    }
+    broadcast_accept_draw
   end
 
   private
     def ai_move
-      ai = @game.players.find { |player| player.ai? }
+      ai = find_ai
       delta = ai.move(@game.board.position, ai.color, {fuzzy: true})
 
       if !delta.nil?
         @game.moves.create!({delta: delta, player_id: ai.id })
       end
+    end
+
+    def ai_respond_to_draw_offer
+      ai = find_ai
+      reply = ai.reply_to_draw_offer(@game)
+
+      ActionCable.server.broadcast "game_#{params[:slug]}", {
+        action: "draw_considered",
+        message: reply[:message]
+      }
+
+      if reply[:accept]
+        broadcast_accept_draw
+      end
+    end
+
+    def find_ai
+      @game.players.find { |player| player.ai? }
     end
 
     def ensure_slug
@@ -113,6 +138,12 @@ class PlayController < ApplicationController
         slug = SecureRandom.hex(4)
         return slug if Game.find_by(slug: slug) == nil
       end 
+    end
+
+    def broadcast_accept_draw
+      ActionCable.server.broadcast "game_#{params[:slug]}", {
+        action: "draw_accepted"
+      }
     end
 
     def build_game(user_id1, user_id2)

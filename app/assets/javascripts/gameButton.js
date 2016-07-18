@@ -1,4 +1,4 @@
-var attachHandlers = function() {
+var attachButtonHandlers = function() {
   $("button.game.new-game").on('click', createNewGame);
   $("button.game.offer-draw").on('click', offerDraw);
   $("button.game.accept-draw").on('click', acceptDraw);
@@ -72,5 +72,5 @@ var disableAcceptDrawButton = function () {
 
 
 $(document).on('turbolinks:load', function() {
-  attachHandlers();
+  attachButtonHandlers();
 });

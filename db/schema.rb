@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160714204701) do
+ActiveRecord::Schema.define(version: 20160718203853) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,10 +59,11 @@ ActiveRecord::Schema.define(version: 20160714204701) do
 
   create_table "players", force: :cascade do |t|
     t.boolean  "first"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.uuid     "user_id"
     t.integer  "game_id"
+    t.integer  "draws_considered", default: [],              array: true
     t.index ["game_id"], name: "index_players_on_game_id", using: :btree
   end
 

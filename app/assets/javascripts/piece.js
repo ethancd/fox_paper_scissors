@@ -12,7 +12,7 @@ var Piece = function(color, type, position){
     this.position = position;
 
     this.moveToPosition();
-    this.attachHandlers();
+    this.attachPieceHandlers();
 
     return this;
   };
@@ -23,7 +23,7 @@ var Piece = function(color, type, position){
     "scissors": "rock"
   };
 
-  this.attachHandlers = function() {
+  this.attachPieceHandlers = function() {
     BoardListener.listen("node.clicked", this.submitMove.bind(this));
     BoardListener.listen("reset", this.resetPiece.bind(this));
     BoardListener.listen("check.threatened", this.checkThreatened.bind(this));

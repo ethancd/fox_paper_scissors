@@ -15,6 +15,74 @@ module AI
     get_minimax_move(node, AI_SEARCH_DEPTH, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
   end
 
+  def reply_to_draw_offer(game) 
+    reply = { accept: false, message: "" }
+
+    if game.moves.length < 16
+      reply[:message] = replies[:too_early]
+      return reply
+    end
+
+    if just_got_offered_a_draw(game)
+      reply[:message] = replies[:too_frequent]
+      return reply
+    end
+
+    self.draws_considered.push(game.moves.length)
+    self.save
+
+    node = GameNode.new(get_game_position(self.color, game.board.position))
+    node.score = node.simple_score(self.color)
+
+    if node.score.between?(get_drawish_min, get_drawish_max)
+      reply[:message] = replies[:too_close]
+    elsif node.score < get_drawish_min
+      reply[:accept] = true
+      if self.draws_considered.length == 1
+        reply[:message] = replies[:favor]
+      else
+        reply[:message] = replies[:resignation]
+      end
+    elsif node.score > get_drawish_max
+      reply[:message] = replies[:is_ahead]
+    end
+
+    reply
+  end
+
+  def replies
+    {
+      too_early: "Draw Denial 501-NYI: not enough moves in game.",
+      too_frequent: "Draw Denial 429-RUD: not enough moves between draw offers.",
+      too_close: "Draw Denial 555-RCT: position uncertain; ask again in 4+ moves.",
+      is_ahead: "Draw Denial 403-WIN: position advantageous; ask again in 4+ moves to dispute.",
+      favor: "Draw Acceptance 200-OK: position deletarious; draw welcomed.",
+      resignation: "Draw Acceptance 202-ACC: drawish position acknowledged."
+    }
+  end
+
+  def just_got_offered_a_draw(game)
+    return false if self.draws_considered.length == 0
+
+    game.moves.length - self.draws_considered.last < 4
+  end
+
+  def get_drawish_min
+    #as it's offered more draws, it gets more willing to accept one
+    baseline = GameNode::MIN_SCORE / 10
+    baseline + get_draws_modifier
+  end
+
+  def get_drawish_max
+    #as it's offered more draws, it stops thinking it's advantage means as much
+    baseline = GameNode::MAX_SCORE / 10
+    baseline + get_draws_modifier
+  end
+
+  def get_draws_modifier
+    (GameNode::MAX_SCORE / 5) * self.draws_considered.length
+  end
+
   def is_cache_full?
     memory = $redis.info("memory")
     memory["used_memory"].to_i > 20_000_000

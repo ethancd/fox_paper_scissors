@@ -1,9 +1,9 @@
 var Board = function(){
   this.initialize = function() {
-    this.attachHandlers();
+    this.attachBoardHandlers();
   };
 
-  this.attachHandlers =  function() {
+  this.attachBoardHandlers =  function() {
     BoardListener.listen("piece.clicked", this.highlightLegalSquares.bind(this));
 
     $('.node').on('click', function () {

@@ -49,6 +49,11 @@ var gameSubscribe = function (slug) {
             message: "It's an agreed-upon draw."
           }));
           break;
+        case "draw_considered":
+            displayMessage(buildMessage({
+              message: "dauntless_drone: " + data.message
+            }));
+          break;
         case "player_swap":
           disableNewGameButton();
           enableOfferDrawButton();
