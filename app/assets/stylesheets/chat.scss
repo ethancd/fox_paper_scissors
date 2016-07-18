@@ -6,7 +6,7 @@
   background-color: rgba(0, 0, 0, .10);
   box-shadow: 1px 1px 2px #333;
   border: 1px solid #000;
-  border-radius: 0 0 10px 10px;
+  border-radius: 20px;
   font-size: 16px;
 
   .messages {
@@ -14,11 +14,12 @@
     margin: 2px;
     background-color: rgba(255, 255, 255, .20);
     overflow: auto;
+    border-radius: 15px 15px 0 0;
     font-family: 'Open Sans', sans-serif;
 
     .message {
-      width: 100%;
-      margin: 5px 1px 1px 1px;
+      width: 95%;
+      margin: 5px auto;
       color: #333;
       word-wrap: break-word;
     }

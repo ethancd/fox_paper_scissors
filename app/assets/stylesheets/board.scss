@@ -40,6 +40,7 @@
   }
 
   .node {
+    position: relative;
     height: 50px;
     width: 50px;
     float: left;
@@ -59,12 +60,15 @@
 
   .piece {
     position: absolute;
+    top: -1px;
+    left: -1px;
     z-index: 2;
     height: 50px;
     width: 50px;
     border: 1px solid #000;
     border-radius: 50%;
-    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 
     &.threatened {
       box-shadow: 0 0 20px #c00;
@@ -84,14 +88,18 @@
 
     &.rock {
       background-image: url(image_path('rock_black.png'));
+      background-size: 46px 46px;
     }
 
     &.paper {
       background-image: url(image_path('paper_black.png'));
+      background-size: 46px 46px;
+      background-position: 30% 70%;
     }
 
     &.scissors {
       background-image: url(image_path('scissors_black.png'));
+      background-size: 48px 48px;
     }
   }
 }
