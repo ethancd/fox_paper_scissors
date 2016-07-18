@@ -22,6 +22,7 @@ var gameSubscribe = function (slug) {
           break;
         case "checkmate":
           enableNewGameButton();
+          addStarToWinner(data.winner);
           displayMessage(buildMessage({
             message: "Checkmate! " + data.winner + " wins!"
           }));
@@ -38,6 +39,15 @@ var getSlug = function() {
   var match = window.location.pathname.match(/[0-9|a-f]{8}/);
 
   return match && match[0];
+};
+
+var addStarToWinner = function (winner) {
+  var $winnerNameEl = $('.player-name').filter(function() {
+    return $(this).text().match(winner);
+  })
+
+  var currentWins = $winnerNameEl.attr('data-content');
+  $winnerNameEl.attr('data-content', currentWins + "*");
 };
 
 var playerJoinedGame = function(data) {
@@ -71,10 +81,12 @@ var swapPlayers = function() {
   current_player.first = !current_player.first
 
   var redName = $(".player-name.red").text();
+  var redWins = $(".player-name.red").attr("data-content")
   var blueName =  $(".player-name.blue").text();
+  var blueWins = $(".player-name.blue").attr("data-content")
 
-  $(".player-name.red").text(blueName);
-  $(".player-name.blue").text(redName);
+  $(".player-name.red").text(blueName).attr("data-content", blueWins);
+  $(".player-name.blue").text(redName).attr("data-content", redWins);
 };
 
 $(document).on('turbolinks:load', function() {

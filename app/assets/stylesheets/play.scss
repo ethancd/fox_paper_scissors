@@ -59,6 +59,10 @@ button.game {
   text-align: center;
   font-family: 'Arvo', serif;
 
+  &:before {
+    content: attr(data-content)
+  }
+
   &.red {
     color: #c00;
 

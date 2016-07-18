@@ -2,6 +2,6 @@
 <% user_name = player.nil? ? "waiting for opponent" : player.user_name %>
 <% noun = player.nil? ? "..." : player.get_noun(user.id) %>
 
-<h3 class="player-name <%= side %>">
+<h3 class="player-name <%= side %>" data-content="">
   <%= user_name %> (<%= noun %>)
 </h3>
