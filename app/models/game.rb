@@ -14,12 +14,24 @@ class Game < ApplicationRecord
   #   self.save
   # end
 
-  def broadcast_position_update(color)
+  def broadcast_position_update(new_move_color)
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "position_update", 
       position: self.board.position,
-      color: color
+      color: new_move_color
     }
+
+    next_color = new_move_color == "red" ? "blue" : "red"
+
+    if self.board.checkmate?(next_color)
+      first_player_won = (new_move_color == "red")
+      winner = Player.find_by({game_id: self.id, first: first_player_won })
+
+      ActionCable.server.broadcast "game_#{self.slug}", {
+        action: "checkmate", 
+        winner: winner.user_name
+      }
+    end
   end
 
   def current_player

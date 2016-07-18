@@ -49,4 +49,7 @@ class Board < ApplicationRecord
     self[:position]
   end
 
+  def checkmate?(side)
+    over?(get_game_position(side, position))
+  end
 end
