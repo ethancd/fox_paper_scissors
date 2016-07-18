@@ -50,12 +50,33 @@ class PlayController < ApplicationController
     opponent = @game.players.find { |player| player.user_id != @user.id }
     if opponent.ai?
       FindMove.perform_later(@game)
+      #ai_move
     end
 
     render :json => { success: true } #@move.valid? }
   end
 
+  def create
+    @game = Game.find_by({slug: params[:slug] })
+    @game.moves.delete_all
+    @game.board.reset_board
+
+    @game.board.save
+    @game.save
+
+    @game.broadcast_position_update("blue")
+  end
+
   private
+    def ai_move
+      ai = @game.players.find { |player| player.ai? }
+      delta = ai.move(@game.board.position, ai.color)
+
+      if !delta.nil?
+        @game.moves.create!({delta: delta, player_id: ai.id })
+      end
+    end
+
     def ensure_slug
       unless valid_slug(params[:slug])
         redirect_to action: action_name, slug: generate_new_slug

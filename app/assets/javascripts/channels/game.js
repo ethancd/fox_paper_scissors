@@ -44,6 +44,12 @@ var gameSubscribe = function (slug) {
           setPiecesToPosition(data.position);
           BoardListener.send("position.updated", {color: data.color});
           break;
+        case "checkmate":
+          enableNewGameButton();
+          displayMessage(buildMessage({
+            message: "Checkmate! " + data.winner + " wins!"
+          }));
+          break;
       };
     }
   });

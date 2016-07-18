@@ -27,8 +27,6 @@ module GameGrammar
   end
 
   def get_legal_deltas(game_position)
-    return nil if illegal_position?(game_position)
-
     legal_deltas = []
 
     active_pieces, passive_pieces = split_pieces(game_position)
@@ -82,9 +80,10 @@ module GameGrammar
   end
 
   def swap_sides(game_position)
-    game_position[0] = other_initial(game_position[0])
+    swapped_game_position = game_position.dup
+    swapped_game_position[0] = other_initial(game_position[0])
 
-    game_position
+    swapped_game_position
   end
 
   def target_valid?(destination, pieces, enemy)
@@ -244,5 +243,9 @@ module GameGrammar
 
   def is_adjacent?(pos1, pos2)
     (pos1[0] - pos2[0]).abs + (pos1[1] - pos2[1]).abs == 2
+  end
+
+  def get_game_position(side, board_position) 
+    side[0] + board_position
   end
 end

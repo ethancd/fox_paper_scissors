@@ -1,74 +1,126 @@
 class GameNode
   include GameGrammar
 
-  attr_reader :game_position, :board_position, :next_mover_side, :causal_delta
+  attr_accessor :score
+  attr_reader :game_position, :board_position, :side, :causal_path, :causal_delta, :initial_delta
 
-  def initialize(game_position, causal_delta = nil)
+  MAX_SCORE = 5
+  MIN_SCORE = -5
+
+  def initialize(game_position, causal_path = [])
     @game_position = game_position
-    @next_mover_side = get_side_from_initial(game_position[0])
+    @side = get_side_from_initial(game_position[0])
     @board_position = game_position[1..6]
-    @causal_delta = causal_delta
+
+    @causal_path = causal_path
+    @initial_delta = causal_path.first
+    @causal_delta = causal_path.last
   end
 
-  def losing_node?(evaluator, depth)
-    # if(!book[@code].nil? && !book[@code].is_a?(Array))
-    #   return book[@code] == :losing
-    # end
+  def simple_score(scoring_side)
+    active_move_count = get_legal_move_count(@game_position)
+    passive_move_count = get_legal_move_count(swap_sides(@game_position))
 
-    if over?(@game_position)
-      verdict = winning_side(@game_position) != evaluator
-      
-      # book[@code] = :losing if verdict
-      return verdict
-    end
-
-    if (depth <= 0)
-      return nil
-    end
-
-    if self.next_mover_side == evaluator
-      verdict = self.children.all? do |node|
-        node.losing_node?(evaluator, depth - 1)
-      end
+    if scoring_side == @side
+      get_weighted_score(active_move_count, passive_move_count)
     else
-      verdict = self.children.any? do |node| 
-        node.losing_node?(evaluator, depth - 1)
-      end
+      get_weighted_score(passive_move_count, active_move_count)
     end
-
-    # book[@code] = :losing if verdict
-    return verdict
   end
 
-  def winning_node?(evaluator, depth)    
-    # if(!book[@code].nil? && !book[@code].is_a?(Array))
-    #   return book[@code] == :winning
-    # end
+  def get_weighted_score(our_moves, their_moves)
+    #ranges from -4.6 to +4.6, with Infinity and -Infinity for winning and losing
+    Math.log(our_moves, 2) - Math.log(their_moves, 2)
+  end
 
-    if over?(@game_position)
-      verdict = winning_side(@game_position) == evaluator
+  def game_over?(simple_score)
+    !simple_score.between?(MIN_SCORE, MAX_SCORE) 
+  end
+
+  # This method generates an array of all moves that can be made after
+  # the current move.
+  def children
+    children = []
+
+    get_legal_deltas(@game_position).each do |delta|
+      position = apply_delta_to_game_position(@game_position, delta)
+
+      children << GameNode.new(position, @causal_path + [delta])
+    end
+
+    children.sort_by { |child| get_legal_move_count(child.game_position) }
+  end
+
+  def losing?(side)
+    puts "AM I LOSING? score=#{@score} && #{@score <= MIN_SCORE}"
+    @score = simple_score(side) if @score.nil?
+    @score <= MIN_SCORE
+  end
+
+  def winning?(side)
+    @score = simple_score(side) if @score.nil?
+    @score >= MAX_SCORE
+  end
+
+  # def losing_node?(evaluator, depth)
+  #   # if(!book[@code].nil? && !book[@code].is_a?(Array))
+  #   #   return book[@code] == :losing
+  #   # end
+
+  #   if over?(@game_position)
+  #     verdict = winning_side(@game_position) != evaluator
       
-      # book[@code] = :winning if verdict
-      return verdict
-    end
+  #     # book[@code] = :losing if verdict
+  #     return verdict
+  #   end
 
-    if (depth <= 0)
-      return nil
-    end
+  #   if (depth <= 0)
+  #     return nil
+  #   end
 
-    if self.next_mover_side == evaluator
-      verdict = self.children.any? do |node| 
-        node.winning_node?(evaluator, depth - 1)
-      end
-    else
-      verdict = self.children.all? do |node| 
-        node.winning_node?(evaluator, depth - 1)
-      end
-    end
+  #   if self.next_mover_side == evaluator
+  #     verdict = self.children.all? do |node|
+  #       node.losing_node?(evaluator, depth - 1)
+  #     end
+  #   else
+  #     verdict = self.children.any? do |node| 
+  #       node.losing_node?(evaluator, depth - 1)
+  #     end
+  #   end
 
-    # book[@code] = :winning if verdict
-    return verdict
-  end
+  #   # book[@code] = :losing if verdict
+  #   return verdict
+  # end
+
+  # def winning_node?(evaluator, depth)    
+  #   # if(!book[@code].nil? && !book[@code].is_a?(Array))
+  #   #   return book[@code] == :winning
+  #   # end
+
+  #   if over?(@game_position)
+  #     verdict = winning_side(@game_position) == evaluator
+      
+  #     # book[@code] = :winning if verdict
+  #     return verdict
+  #   end
+
+  #   if (depth <= 0)
+  #     return nil
+  #   end
+
+  #   if self.next_mover_side == evaluator
+  #     verdict = self.children.any? do |node| 
+  #       node.winning_node?(evaluator, depth - 1)
+  #     end
+  #   else
+  #     verdict = self.children.all? do |node| 
+  #       node.winning_node?(evaluator, depth - 1)
+  #     end
+  #   end
+
+  #   # book[@code] = :winning if verdict
+  #   return verdict
+  # end
 
   # def score_node(evaluator, depth)
   #   #the more children it has, the better
@@ -105,28 +157,4 @@ class GameNode
   # def score_node(evaluator, depth)
   #   return nil if depth <= 0 
   # end
-
-  def simple_score_node(side)
-    our_moves = get_legal_move_count(@game_position)
-    their_moves = get_legal_move_count(swap_sides(@game_position))
-
-    get_weighted_score(our_moves, their_moves)
-  end
-
-  def get_weighted_score(our_moves, their_moves)
-    Math.log(our_moves, 2) - Math.log(their_moves, 2)
-  end
-
-  # This method generates an array of all moves that can be made after
-  # the current move.
-  def children
-    children = []
-
-    get_legal_deltas(@game_position).each do |delta|
-      position = apply_delta_to_game_position(@game_position, delta)
-      children << GameNode.new(position, delta)
-    end
-
-    children
-  end
 end

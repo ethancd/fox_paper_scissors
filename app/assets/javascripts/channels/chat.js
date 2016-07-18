@@ -29,7 +29,10 @@ var buildMessage = function(data) {
     text: data.message
   });
 
-  $el.css("color", data.color)
+  if (data.color) {
+    $el.css("color", data.color)
+  }
+  
   return $el;
 };
 

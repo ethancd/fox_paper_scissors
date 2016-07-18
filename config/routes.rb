@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   match 'message', to: 'message#create', via: [:post]
   match 'play/move', to: 'play#move', via: [:post]
+  match 'play/create', to: 'play#create', via: [:post]
 
   mount ActionCable.server => "/cable"
 end

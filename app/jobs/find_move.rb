@@ -4,6 +4,15 @@ class FindMove < ActiveJob::Base
   def perform(game)
     ai = game.players.find { |player| player.ai? }
     delta = ai.move(game.board.position, ai.color)
-    game.moves.create!({delta: delta, player_id: ai.id })
+
+    if !delta.nil?
+      game.moves.create!({delta: delta, player_id: ai.id })
+    else 
+      color = (ai.color == "red") ? "blue" : "red"
+      ActionCable.server.broadcast "game_#{game.slug}", {
+        action: "checkmate",
+        winner: color
+      }
+    end
   end
 end

@@ -12,6 +12,11 @@ class Board < ApplicationRecord
     @pieces = get_pieces(self[:position])
   end
 
+  def reset_board
+    self[:position] = STARTING_POSITION
+    setup_board
+  end
+
   def piece_colors
     [:red, :blue]
   end
