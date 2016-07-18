@@ -3,15 +3,21 @@ module AI
 
   attr_accessor :fuzzy
 
-  AI_SEARCH_DEPTH = 5
+  AI_SEARCH_DEPTH = 6
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
 
   def move(board_position, side, options = {})
     @fuzzy = options[:fuzzy]
     @side = side
+    @full_cache = is_cache_full?
     node = GameNode.new(get_game_position(side, board_position))
 
     get_minimax_move(node, AI_SEARCH_DEPTH, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+  end
+
+  def is_cache_full?
+    memory = $redis.info("memory")
+    memory["used_memory"].to_i > 20_000_000
   end
 
   def get_minimax_move(node, depth, min_limit, max_limit)
@@ -32,10 +38,17 @@ module AI
   end
 
   def get_minimax_score(node, depth, min_limit, max_limit)
+    cached_node = check_cache(node, depth, min_limit, max_limit)
+    return cached_node if cached_node
+      
     node.score = node.simple_score(@side)
-    return node if node.game_over?(node.score) || depth == 0
+    if node.game_over?(node.score) || depth == 0
+      cache_node(depth, node, :exact)
+      return node 
+    end
      
     if node.side == @side
+      score_type = :min
       node.score = min_limit if node.initial_delta.nil?
       best_node = node
 
@@ -43,11 +56,19 @@ module AI
         potential_node = get_minimax_score(child, depth - 1, best_node.score, max_limit)
 
         best_node = potential_node if is_better(potential_node.score, best_node.score)
-        return best_node if best_node.score > max_limit
+        if best_node.score > max_limit
+          cache_node(depth, best_node, :max)
+          return best_node 
+        elsif potential_node.score > min_limit
+          score_type = :exact
+        end
       end
+
+      cache_node(depth, best_node, score_type)
 
       return best_node
     else
+      score_type = :max
       node.score = max_limit if node.initial_delta.nil?
       worst_node = node
 
@@ -55,8 +76,15 @@ module AI
         potential_node = get_minimax_score(child, depth - 1, min_limit, worst_node.score)
 
         worst_node = potential_node if is_worse(potential_node.score, worst_node.score)
-        return worst_node if worst_node.score < min_limit
+        if worst_node.score < min_limit
+          cache_node(depth, worst_node, :min)
+          return worst_node 
+        elsif potential_node.score > min_limit
+          score_type = :exact;
+        end
       end
+
+      cache_node(depth, worst_node, score_type)
 
       return worst_node
     end
@@ -84,112 +112,46 @@ module AI
     @fuzz_generator.rng
   end
 
- # minimax algorithm from https://www.cs.cornell.edu/courses/cs312/2002sp/lectures/rec21.htm
- # (* the minimax value of n, searched to depth d.
- # * If the value is less than min, returns min.
- # * If greater than max, returns max. *)
- # fun minimax(n: node, d: int, min: int, max: int): int =
- #   if leaf(n) or depth=0 return evaluate(n)
- #   if n is a max node
- #      v := min
- #      for each child of n
- #         v' := minimax (child,d-1,v,max)
- #         if v' > v, v:= v'
- #         if v > max return max
- #      return v
- #   if n is a min node
- #      v := max
- #      for each child of n
- #         v' := minimax (child,d-1,min,v)
- #         if v' < v, v:= v'
- #         if v < min return min
- #      return v
+  def check_cache(node, depth, min_limit, max_limit)
+    return unless $redis.exists(node.game_position)
+    entry = $redis.hgetall(node.game_position)
 
-  # def fake_timed_move(board_position, side)
-  #   begin
-  #     require "timeout"
-  #     Timeout::timeout(5) do
-  #       loop do
-  #         1 + 1
-  #       end 
-  #     end
-  #   rescue Timeout::Error => e
-  #     return random_move(board_position, side)
-  #   end
-  # end
+    return unless entry["depth"].to_i >= depth
 
-  # def timed_move(board_position, side)
-  #   puts "Thinking..."
+    entry_score = entry["score"].to_f
+    case entry["type"].to_sym
+      when :exact
+        node.score = entry_score
+        return node
+      when :min
+        if entry_score <= min_limit
+          node.score = entry_score.to_f
+          return node
+        end
+      when :max
+        if entry_score >= max_limit
+          node.score = entry_score.to_f
+          return node
+        end
+      end
+  end
 
-  #   node = GameNode.new(board_position, side) 
-  #   possible_moves = node.children.shuffle
-  #   depth = 3
-  #   deepest_move = possible_moves.sample.causal_move
+  def cache_node(depth, node, score_type)
+    return if @full_cache
 
-  #   begin
-  #     require "timeout"
-  #     Timeout::timeout(5) do
-  #       loop do
-  #         evaluated_move = find_move(possible_moves, side, depth)
+    if $redis.exists(node.game_position)
+      if depth < $redis.hget(node.game_position, "depth").to_i
+        return
+      end
+    end
 
-  #         if evaluated_move.evaluation == :winning 
-  #           return evaluated_move.move 
-  #         end
+    $redis.hmset(node.game_position,
+      :depth, depth,
+      :type, score_type,
+      :score, node.score.round(2)
+    )
+  end
 
-  #         deepest_move = evaluated_move.move
-
-  #         puts "#{depth} layers deep"
-  #         depth += 1
-  #       end 
-  #     end
-  #   rescue Timeout::Error => e
-  #     return deepest_move
-  #   end
-
-  #   return deepest_move
-  # end
-
-  # def random_move(board_position, side)
-  #   node = GameNode.new(side[0] + board_position) 
-  #   possible_nodes = node.children.shuffle;
-
-  #   new_node = find_checkmate_move(possible_nodes, side)
-  #   if new_node
-  #     return new_node.causal_delta
-  #   end
-
-  #   return possible_nodes.sample.causal_delta
-  # end
-
-  # def find_move(possible_nodes, side, depth)
-  #   node = find_checkmate_move(possible_moves, side)
-  #   return EvaluatedMove.new(node.causal_move, :winning) if node
-
-  #   node = find_winning_move(possible_moves, side, depth)
-  #   return EvaluatedMove.new(node.causal_move, :winning) if node
-
-  #   non_losing_moves = find_all_non_losing_moves(possible_moves, side, depth)
-  #   possible_moves = non_losing_moves if non_losing_moves.length != 0
-
-  #   node = find_minimax_move(possible_moves, side, depth - 2)
-  #   return EvaluatedMove.new(node.causal_move)
-  # end
-
-  # def find_checkmate_move(possible_nodes, side)
-  #   possible_nodes.find{ |child| winning_side(child.game_position)}
-  # end
-
-  # def find_winning_move(possible_nodes, side, depth)
-  #   possible_nodes.find{ |child| child.winning_node?(side, depth) }
-  # end
-
-  # def find_all_non_losing_moves(possible_nodes, side, depth)
-  #   possible_nodes.find_all { |child| !child.losing_node?(side, depth) }
-  # end
-
-  # def find_minimax_move(possible_nodes, side, depth)
-  #   possible_nodes.max_by do |child| 
-  #     child.simple_score_node(side)
-  #   end
-  # end
+# minimax algorithm from https://www.cs.cornell.edu/courses/cs312/2002sp/lectures/rec21.htm
+# transposition table (aka position-value cache) algorithm from http://web.archive.org/web/20070822204120/www.seanet.com/~brucemo/topics/hashing.htm
 end
