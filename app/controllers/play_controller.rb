@@ -13,7 +13,7 @@ class PlayController < ApplicationController
     end
 
     if @game.is_ai_turn?
-      FindMove.set(wait: 3.seconds).perform_later(@game)
+      FindMove.set(wait: 1.seconds).perform_later(@game)
     end
 
     render "index"
@@ -60,17 +60,24 @@ class PlayController < ApplicationController
     @game = Game.find_by({slug: params[:slug] })
     @game.moves.delete_all
     @game.board.reset_board
+    #@game.swap_player_order
 
     @game.board.save
     @game.save
 
     @game.broadcast_position_update("blue")
+
+    first_player = @game.players.find { |player| player.first }
+    if first_player.ai?
+      FindMove.perform_later(@game)
+      #ai_move
+    end
   end
 
   private
     def ai_move
       ai = @game.players.find { |player| player.ai? }
-      delta = ai.move(@game.board.position, ai.color)
+      delta = ai.move(@game.board.position, ai.color, {fuzzy: true})
 
       if !delta.nil?
         @game.moves.create!({delta: delta, player_id: ai.id })
@@ -96,6 +103,7 @@ class PlayController < ApplicationController
 
     def build_game(user_id1, user_id2)
       @game.players.new([{user_id: user_id1, first: true}, {user_id: user_id2, first: false}])
+      @game.shuffle_player_order
 
       @game.create_chat
       @game.create_board

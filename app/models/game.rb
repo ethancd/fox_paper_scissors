@@ -5,13 +5,20 @@ class Game < ApplicationRecord
   has_one :board, dependent: :destroy
   has_one :chat, dependent: :destroy
 
-  # def shuffle_player_order
-  #   players = self.players.shuffle
-  #   players[0][:first] = true
-  #   players[1][:first] = false
+  def shuffle_player_order
+    players = self.players.shuffle
+    players[0][:first] = true
+    players[1][:first] = false
 
-  #   self.players = players
-  #   self.save
+    self.players = players
+    self.save
+  end
+
+  # def swap_player_order
+  #   self.players.each do |player|
+  #     player.first = !player.first
+  #     player.save
+  #   end
   # end
 
   def broadcast_position_update(new_move_color)

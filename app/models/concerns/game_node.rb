@@ -4,8 +4,9 @@ class GameNode
   attr_accessor :score
   attr_reader :game_position, :board_position, :side, :causal_path, :causal_delta, :initial_delta
 
-  MAX_SCORE = 5
-  MIN_SCORE = -5
+  WEIGHTED_LOG_BASE = 3
+  MAX_SCORE = Math.log(24, WEIGHTED_LOG_BASE)
+  MIN_SCORE = -Math.log(24, WEIGHTED_LOG_BASE)
 
   def initialize(game_position, causal_path = [])
     @game_position = game_position
@@ -29,8 +30,8 @@ class GameNode
   end
 
   def get_weighted_score(our_moves, their_moves)
-    #ranges from -4.6 to +4.6, with Infinity and -Infinity for winning and losing
-    Math.log(our_moves, 2) - Math.log(their_moves, 2)
+    #ranges from -2.9 to +2.9, with Infinity and -Infinity for winning and losing
+    Math.log(our_moves, WEIGHTED_LOG_BASE) - Math.log(their_moves, WEIGHTED_LOG_BASE)
   end
 
   def game_over?(simple_score)
@@ -52,7 +53,6 @@ class GameNode
   end
 
   def losing?(side)
-    puts "AM I LOSING? score=#{@score} && #{@score <= MIN_SCORE}"
     @score = simple_score(side) if @score.nil?
     @score <= MIN_SCORE
   end

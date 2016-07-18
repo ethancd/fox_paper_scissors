@@ -1,9 +1,13 @@
 module AI
   include GameGrammar
 
-  AI_SEARCH_DEPTH = 5
+  attr_accessor :fuzzy
 
-  def move(board_position, side)
+  AI_SEARCH_DEPTH = 5
+  FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
+
+  def move(board_position, side, options = {})
+    @fuzzy = options[:fuzzy]
     @side = side
     node = GameNode.new(get_game_position(side, board_position))
 
@@ -38,7 +42,7 @@ module AI
       node.children.each do |child|
         potential_node = get_minimax_score(child, depth - 1, best_node.score, max_limit)
 
-        best_node = potential_node if potential_node.score > best_node.score
+        best_node = potential_node if is_better(potential_node.score, best_node.score)
         return best_node if best_node.score > max_limit
       end
 
@@ -50,12 +54,34 @@ module AI
       node.children.each do |child|
         potential_node = get_minimax_score(child, depth - 1, min_limit, worst_node.score)
 
-        worst_node = potential_node if potential_node.score < worst_node.score
+        worst_node = potential_node if is_worse(potential_node.score, worst_node.score)
         return worst_node if worst_node.score < min_limit
       end
 
       return worst_node
     end
+  end
+
+  def is_better(potential_score, current_score)
+    if @fuzzy
+      potential_score + get_fuzz > current_score
+    else
+      potential_score > current_score
+    end
+  end
+
+  def is_worse(potential_score, current_score)
+    if @fuzzy
+      potential_score + get_fuzz < current_score
+    else
+      potential_score < current_score
+    end
+  end
+
+  def get_fuzz
+    @fuzz_generator ||= Rubystats::NormalDistribution.new(0, FUZZY_STANDARD_DEVIATION)
+
+    @fuzz_generator.rng
   end
 
  # minimax algorithm from https://www.cs.cornell.edu/courses/cs312/2002sp/lectures/rec21.htm
