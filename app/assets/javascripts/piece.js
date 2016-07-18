@@ -37,9 +37,10 @@ var Piece = function(color, type, position){
   };
 
   this.highlight = function(skipValidation) {
-    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-tracker'))) {
+    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-tracker')) || this.$el.prop("disabled")) {
       return;
     }
+
     this.$el.toggleClass("highlighted")
     $('.piece').not(this.$el).removeClass("highlighted");
 
@@ -209,12 +210,21 @@ var getPieceData = function() {
 }
 
 var setPiecesToPosition = function(position) {
+  enablePieces();
   for (var i = 0; i < Pieces.length; i++) {
     var piece = Pieces[i]
     coords = getCoords(position[i]);
     piece.position = coords;
     piece.moveToPosition();
   }
+};
+
+var disablePieces = function() {
+  $('.piece').prop("disabled", true);
+};
+
+var enablePieces = function() {
+  $('.piece').prop("disabled", false);
 };
 
 var initializePieces = function() { 

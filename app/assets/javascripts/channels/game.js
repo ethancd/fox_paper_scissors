@@ -19,17 +19,41 @@ var gameSubscribe = function (slug) {
         case "position_update":
           setPiecesToPosition(data.position);
           BoardListener.send("position.updated", {color: data.color});
+          enableOfferDrawButton();
+          disableAcceptDrawButton();
           break;
         case "checkmate":
+          disablePieces();
+          disableOfferDrawButton();
           enableNewGameButton();
           addStarToWinner(data.winner);
           displayMessage(buildMessage({
             message: "Checkmate! " + data.winner + " wins!"
           }));
           break;
+        case "draw_offered":
+          displayMessage(buildMessage({
+            message: data.offerer_name + " offers a draw."
+          }));
+          
+          if(data.offerer_id != current_player.user_id) {
+            disableOfferDrawButton();
+            enableAcceptDrawButton();
+          }
+          break;
+        case "draw_accepted":
+          disablePieces();
+          enableNewGameButton();
+          disableOfferDrawButton();
+          displayMessage(buildMessage({
+            message: "It's an agreed-upon draw."
+          }));
+          break;
         case "player_swap":
           disableNewGameButton();
+          enableOfferDrawButton();
           swapPlayers();
+          break;
       };
     }
   });
@@ -46,8 +70,8 @@ var addStarToWinner = function (winner) {
     return $(this).text().match(winner);
   })
 
-  var currentWins = $winnerNameEl.attr('data-content');
-  $winnerNameEl.attr('data-content', currentWins + "*");
+  var currentScore = $winnerNameEl.attr('data-content');
+  $winnerNameEl.attr('data-content', currentScore + "*");
 };
 
 var playerJoinedGame = function(data) {
@@ -62,6 +86,8 @@ var playerJoinedGame = function(data) {
       displayMessage(buildMessage({
         message: "Share this page's url with a friend to start playing: " + window.location
       }));
+    } else {
+      enableOfferDrawButton();
     }
     return;
   }
@@ -74,6 +100,7 @@ var playerJoinedGame = function(data) {
 
   setPiecesToPosition(data.position);
   setPlayerName(new_player);
+  enableOfferDrawButton();
 };
 
 var swapPlayers = function() {

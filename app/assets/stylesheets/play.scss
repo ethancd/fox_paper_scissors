@@ -25,13 +25,7 @@ button.game {
   &:disabled {
     cursor: default;
     color: #000;
-    opacity: 0;
-  }
-
-  &.waiting {
-    cursor: default;
-    background-color: #777;
-    border: 2px solid darken(#777, 20%);
+    display: none;
   }
 
   &.new-game {
@@ -40,11 +34,12 @@ button.game {
   }
 
   &.offer-draw {
-    background-color: #0b4;
-    border: 2px solid darken(#0b4, 20%);
+    background-color: #4a6;
+    border: 2px solid darken(#4a6, 20%);
   }
 
   &.accept-draw {
+    box-shadow: 0 0 10px #0f0;
     background-color: #0f5;
     border: 2px solid darken(#0f5, 20%);
   }

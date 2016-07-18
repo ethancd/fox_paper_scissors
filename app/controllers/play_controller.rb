@@ -74,6 +74,20 @@ class PlayController < ApplicationController
     end
   end
 
+  def offer_draw
+    ActionCable.server.broadcast "game_#{params[:slug]}", {
+      action: "draw_offered",
+      offerer_name: @user.name,
+      offerer_id: @user.id
+    }
+  end
+
+  def accept_draw
+    ActionCable.server.broadcast "game_#{params[:slug]}", {
+      action: "draw_accepted"
+    }
+  end
+
   private
     def ai_move
       ai = @game.players.find { |player| player.ai? }
