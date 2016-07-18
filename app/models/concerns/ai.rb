@@ -3,7 +3,7 @@ module AI
 
   attr_accessor :fuzzy
 
-  AI_SEARCH_DEPTH = 6
+  AI_SEARCH_DEPTH = 5
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
 
   def move(board_position, side, options = {})
@@ -39,7 +39,7 @@ module AI
 
   def get_minimax_score(node, depth, min_limit, max_limit)
     cached_node = check_cache(node, depth, min_limit, max_limit)
-    return cached_node if cached_node
+    return cached_node if cached_node && !cached_node.initial_delta.nil?
       
     node.score = node.simple_score(@side)
     if node.game_over?(node.score) || depth == 0
