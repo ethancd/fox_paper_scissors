@@ -9,7 +9,6 @@ module AI
   def move(board_position, side, options = {})
     @fuzzy = options[:fuzzy]
     @side = side
-    @full_cache = is_cache_full?
     node = GameNode.new(get_game_position(side, board_position))
 
     get_minimax_move(node, AI_SEARCH_DEPTH, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
@@ -81,11 +80,6 @@ module AI
 
   def get_draws_modifier
     (GameNode::MAX_SCORE / 5) * self.draws_considered.length
-  end
-
-  def is_cache_full?
-    memory = $redis.info("memory")
-    memory["used_memory"].to_i > 20_000_000
   end
 
   def get_minimax_move(node, depth, min_limit, max_limit)
@@ -205,8 +199,6 @@ module AI
   end
 
   def cache_node(depth, node, score_type)
-    return if @full_cache
-
     if $redis.exists(node.game_position)
       if depth < $redis.hget(node.game_position, "depth").to_i
         return
