@@ -14,31 +14,7 @@ var gameSubscribe = function (slug) {
 
       switch(data.action) {
         case "player_joined_game":
-          var new_player = JSON.parse(data.player);
-
-          if(!new_player) {
-            return;
-          }
-
-          if(current_player && current_player.user_id == new_player.user_id) {
-
-            if($('.player-name.waiting').length) {
-              displayMessage(buildMessage({
-                message: "Share this page's url with a friend to start playing: " + window.location
-              }));
-            }
-
-            return;
-          }
-
-          if(data.pieces) {
-            Pieces = JSON.parse(data.pieces);
-            createHtmlPieces();
-            initializePieces();
-          }
-
-          setPiecesToPosition(data.position);
-          setPlayerName(new_player);
+          playerJoinedGame(data)
           break;
         case "position_update":
           setPiecesToPosition(data.position);
@@ -50,6 +26,9 @@ var gameSubscribe = function (slug) {
             message: "Checkmate! " + data.winner + " wins!"
           }));
           break;
+        case "player_swap":
+          disableNewGameButton();
+          swapPlayers();
       };
     }
   });
@@ -59,6 +38,43 @@ var getSlug = function() {
   var match = window.location.pathname.match(/[0-9|a-f]{8}/);
 
   return match && match[0];
+};
+
+var playerJoinedGame = function(data) {
+  var new_player = JSON.parse(data.player);
+
+  if(!new_player) {
+    return;
+  }
+
+  if(current_player && current_player.user_id == new_player.user_id) {
+    if($('.player-name.waiting').length) {
+      displayMessage(buildMessage({
+        message: "Share this page's url with a friend to start playing: " + window.location
+      }));
+    }
+    return;
+  }
+
+  if(data.pieces) {
+    Pieces = JSON.parse(data.pieces);
+    createHtmlPieces();
+    initializePieces();
+  }
+
+  setPiecesToPosition(data.position);
+  setPlayerName(new_player);
+};
+
+var swapPlayers = function() {
+  current_player.color = (current_player.color == "red" ? "blue" : "red")
+  current_player.first = !current_player.first
+
+  var redName = $(".player-name.red").text();
+  var blueName =  $(".player-name.blue").text();
+
+  $(".player-name.red").text(blueName);
+  $(".player-name.blue").text(redName);
 };
 
 $(document).on('turbolinks:load', function() {

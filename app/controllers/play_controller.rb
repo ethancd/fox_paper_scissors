@@ -13,7 +13,7 @@ class PlayController < ApplicationController
     end
 
     if @game.is_ai_turn?
-      FindMove.set(wait: 1.seconds).perform_later(@game)
+      FindMove.set(wait: 3.seconds).perform_later(@game)
     end
 
     render "index"
@@ -60,12 +60,12 @@ class PlayController < ApplicationController
     @game = Game.find_by({slug: params[:slug] })
     @game.moves.delete_all
     @game.board.reset_board
-    #@game.swap_player_order
+    @game.swap_player_order
 
     @game.board.save
     @game.save
 
-    @game.broadcast_position_update("blue")
+    @game.broadcast_new_game
 
     first_player = @game.players.find { |player| player.first }
     if first_player.ai?

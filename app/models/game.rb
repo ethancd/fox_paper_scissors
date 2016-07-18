@@ -14,12 +14,12 @@ class Game < ApplicationRecord
     self.save
   end
 
-  # def swap_player_order
-  #   self.players.each do |player|
-  #     player.first = !player.first
-  #     player.save
-  #   end
-  # end
+  def swap_player_order
+    self.players.each do |player|
+      player.first = !player.first
+      player.save
+    end
+  end
 
   def broadcast_position_update(new_move_color)
     ActionCable.server.broadcast "game_#{self.slug}", {
@@ -31,14 +31,26 @@ class Game < ApplicationRecord
     next_color = new_move_color == "red" ? "blue" : "red"
 
     if self.board.checkmate?(next_color)
-      first_player_won = (new_move_color == "red")
-      winner = Player.find_by({game_id: self.id, first: first_player_won })
-
-      ActionCable.server.broadcast "game_#{self.slug}", {
-        action: "checkmate", 
-        winner: winner.user_name
-      }
+      broadcast_checkmate(next_color)
     end
+  end
+
+  def broadcast_checkmate(next_color)
+    first_player_won = (next_color == "blue")
+    winner = Player.find_by({game_id: self.id, first: first_player_won })
+
+    ActionCable.server.broadcast "game_#{self.slug}", {
+      action: "checkmate", 
+      winner: winner.user_name
+    }
+  end
+
+  def broadcast_new_game
+    broadcast_position_update("blue")
+
+    ActionCable.server.broadcast "game_#{self.slug}", {
+      action: "player_swap"
+    }
   end
 
   def current_player
