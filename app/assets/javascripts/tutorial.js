@@ -3,6 +3,7 @@ var tickMs = 3000;
 var runTutorial = function(exampleGames) {
   var gameCounter = 0;
   var moveCounter = 0;
+  tutorialEnded = false;
 
   displayTutorialMessage(buildTutorialMessage("<span>Demo Game 1:</span>"));
 
@@ -12,6 +13,10 @@ var runTutorial = function(exampleGames) {
 }
 
 var tickTutorial = function (exampleGames, gameCounter, moveCounter) {
+  if (tutorialEnded) {
+    return;
+  }
+
   var exampleGame = exampleGames[gameCounter];
   executeTutorialStep(exampleGame.moves[moveCounter]);
   publishTutorialMessage(exampleGame.messages[moveCounter]);
@@ -179,8 +184,14 @@ var exampleGames = [
   exampleGameLongMirrorOpeningRedWin
 ];
 
+var endTutorial = function () {
+  tutorialEnded = true;
+}
+
 $(document).on('turbolinks:load', function () {
   if ($('.tutorial-area').length) {
     runTutorial(exampleGames);
+  } else {
+    endTutorial();
   }
 })
