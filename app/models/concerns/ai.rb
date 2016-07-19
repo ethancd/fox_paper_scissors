@@ -86,10 +86,22 @@ module AI
     best_node = get_minimax_score(node, depth, min_limit, max_limit)
 
     if best_node.losing?(@side)
-      return random_move(node) 
+      return survival_move(node) 
     end
 
     best_node.initial_delta
+  end
+
+  def survival_move(node)
+    children = node.children
+    return nil if children.length == 0
+
+    surviving_node = children.max_by do |child|
+      best_node = get_minimax_score(child, AI_SEARCH_DEPTH - 1, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+      best_node.causal_path.length
+    end
+
+    surviving_node.initial_delta
   end
 
   def random_move(node)
