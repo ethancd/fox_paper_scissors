@@ -1,11 +1,15 @@
-@import 'variables';
+@import 'colors';
+@import 'mixins';
+
+$red-shadow-color: darken($med-bright-red, 25%);
+$blue-shadow-color: darken($med-bright-blue, 25%);
 
 .play-area {
   width: 850px;
   height: 450px;
   margin: 10px auto;
 
-  & > div {
+  .turn-tracker, .board, .chat {
     float: left;
     margin-left: 25px;
 
@@ -17,39 +21,34 @@
 
 button.game {
   float: left;
-  margin: 0 0 0 5px;
   width: 110px;
   height: 31px;
+  margin-left: 5px;
   text-align: center;
 
   &:disabled {
-    cursor: default;
-    color: #000;
     display: none;
   }
 
   &.new-game {
-    background-color: #0af;
-    border: 2px solid darken(#0af, 20%);
+    @include button($turquoise);
   }
 
   &.offer-draw {
-    background-color: #4a6;
-    border: 2px solid darken(#4a6, 20%);
+    @include button($dim-green);
   }
 
   &.accept-draw {
-    box-shadow: 0 0 10px #0f0;
-    background-color: #0f5;
-    border: 2px solid darken(#0f5, 20%);
+    @include button($bright-bluish-green);
+    box-shadow: 0 0 10px $green;
   }
 }
 
 .player-name {
   position: relative;
+  left: -50px;
   width: 850px;
   margin: 20px auto;
-  left: -50px;
   font-size: 36px;
   text-align: center;
   font-family: 'Arvo', serif;
@@ -59,46 +58,21 @@ button.game {
   }
 
   &.red {
-    color: #c00;
-
-    $red-shadow-color: darken(#c00, 25%);
-    text-shadow:
-     -1px -1px 0 $red-shadow-color,  
-      1px -1px 0 $red-shadow-color,
-      -1px 1px 0 $red-shadow-color,
-       1px 1px 0 $red-shadow-color;
+    color: $med-bright-red;
+    @include text_stroke($red-shadow-color);
   }
 
   &.blue {
-    color: #00c;
-    $blue-shadow-color: darken(#00c, 25%);
-    text-shadow:
-     -1px -1px 0 $blue-shadow-color,  
-      1px -1px 0 $blue-shadow-color,
-      -1px 1px 0 $blue-shadow-color,
-       1px 1px 0 $blue-shadow-color;
+    color: $med-bright-blue;
+    @include text_stroke($blue-shadow-color);
   }
 
   &.gray {
-    color: #333;
-
-    $gray-shadow-color: #000;
-    text-shadow:
-     -1px -1px 0 $gray-shadow-color,  
-      1px -1px 0 $gray-shadow-color,
-      -1px 1px 0 $gray-shadow-color,
-       1px 1px 0 $gray-shadow-color;
+    color: $very-dark-gray;
+    @include text_stroke($black);
   }
 }
 
 .play-image {
-  position: absolute;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  background-image: url(image_path('chess_bg.jpg'));
-  background-size: cover;
-  -webkit-filter: blur(15px) grayscale(75%) brightness(150%);
-  filter: blur(15px) grayscale(75%) brightness(150%);
+  @include site_background_image(15px, 75%, 150%);
 }

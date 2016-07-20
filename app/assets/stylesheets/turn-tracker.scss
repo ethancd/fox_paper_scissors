@@ -1,0 +1,47 @@
+@import 'colors';
+@import 'mixins';
+
+$pointing-up: true;
+$pointing-down: false;
+
+.turn-tracker {
+  position: relative;
+  z-index: 1;
+  width: 123px;
+  height: 100%;
+  border: 1px solid $black;
+  border-radius: 20px;
+  box-shadow: 1px 1px 2px $med-gray;
+  background-color: $very-transparent-black;
+
+  .turn-marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 0; 
+    height: 0; 
+    margin: auto;
+
+    &.red {
+      @include triangle($red, 50px, $pointing-up);
+      top: 50px;
+
+      &:before {
+        @include triangle-stroke(55px, $pointing-up);
+        right: 33px;
+        bottom: 3px;
+      }
+    }
+
+    &.blue {
+      @include triangle($blue, 50px, $pointing-down);
+      bottom: 50px;
+
+      &:before {
+        @include triangle-stroke(55px, $pointing-down);
+        right: 33px;
+        bottom: 52px;
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@
 <%= render partial: "shared/player_name", locals: { player: first_player, user: @user } %>
 
 <div class="play-area">
-  <%= render partial: "shared/timer", locals: { player: @game.current_player } %>
+  <%= render partial: "shared/turn_tracker", locals: { player: @game.current_player } %>
   <%= render partial: "shared/board", locals: { board: @game.board } %>
   <%= render partial: "shared/chat", locals: { chat: @game.chat } %>
 </div>

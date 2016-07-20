@@ -1,0 +1,60 @@
+@import 'colors';
+
+@mixin piece_background ($image-url, $size, $position: center) {
+    background-image: url(image_path($image-url));
+    background-size: $size $size;
+    background-position: $position;
+}
+
+@mixin text_stroke($color) {
+  text-shadow:
+    -1px -1px 0 $color,
+    -1px 1px 0 $color,
+    1px -1px 0 $color,
+    1px 1px 0 $color;
+}
+
+@mixin filter($blur, $grayscale, $brightness) {
+  -webkit-filter: blur($blur) grayscale($grayscale) brightness($brightness);
+  filter: blur($blur) grayscale($grayscale) brightness($brightness);
+}
+
+@mixin site_background_image($blur, $grayscale, $brightness) {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-image: url(image_path('chess_bg.jpg'));
+  @include filter($blur, $grayscale, $brightness);
+}
+
+@mixin button($color) {
+  cursor: pointer;
+  border: 2px solid darken($color, 20%);
+  border-radius: 8px;
+  background-color: $color;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+@mixin triangle($color, $width, $pointing-up) {
+  $side-length: ($width * .6);
+  border-left: $side-length solid transparent;
+  border-right: $side-length solid transparent;
+
+  @if $pointing-up {
+    border-bottom: $width solid $color;
+  } @else {
+    border-top: $width solid $color;
+  }
+}
+
+@mixin triangle-stroke($width, $pointing-up) {
+  @include triangle($black, $width, $pointing-up);
+  position: relative;
+  z-index: -1;
+  content: "";
+  display: table;
+}

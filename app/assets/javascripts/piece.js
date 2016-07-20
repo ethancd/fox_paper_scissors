@@ -37,7 +37,7 @@ var Piece = function(color, type, position){
   };
 
   this.highlight = function(skipValidation) {
-    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-tracker')) || this.$el.prop("disabled")) {
+    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-marker')) || this.$el.prop("disabled")) {
       return;
     }
 
@@ -56,7 +56,7 @@ var Piece = function(color, type, position){
     }
 
     var target = getPosition(data.node);
-    var turn = $(".turn-tracker").hasClass("red") ? "red" : "blue";
+    var turn = $(".turn-marker").hasClass("red") ? "red" : "blue";
 
     var data = {
       slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
@@ -68,28 +68,7 @@ var Piece = function(color, type, position){
 
     this.movePiece(target)
 
-    $.post('/play/move/', data, function(response) {
-      if (!response.success) {
-        this.unMovePiece()
-        alert("Invalid move, sorry");
-        return
-      }
-
-      if(response.victory) {
-        alert("Congratulations, you win!")
-        return
-      }
-
-      if(response.move) {
-        var targetPiece = response.move.piece;
-        var piece = Pieces.find(function(p) {
-          return p.color == targetPiece.color && p.type == targetPiece.type;
-        });
-
-        piece.highlight();
-        piece.delayedMove(response.move.target, 1000);
-      }
-    }.bind(this));
+    $.post('/play/move/', data);
   };
 
   this.delayedMove = function (target, tick) {

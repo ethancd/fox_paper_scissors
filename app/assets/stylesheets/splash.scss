@@ -1,39 +1,37 @@
-@import 'variables';
+@import 'colors';
+@import 'mixins';
+
+$default-link-color: $bright-blue;
+$med-green-border: darken($med-green, 10%);
+$brightish-blue-border: darken($brightish-blue, 10%);
 
 .container {
   position: relative;
   width: 350px;
   margin: 25px auto;
-  border: 1px solid #000;
+  border: 1px solid $black;
   border-radius: 20px;
-  box-shadow: 3px 3px 5px #333;
-  background-color: rgba(200, 200, 200, 0.5);
+  box-shadow: 3px 3px 5px $very-dark-gray;
+  background-color: $transparent-light-gray;
 }
 
 .site-title {
   position: absolute;
   top: 0;
   left: -305px;
+  color: $black;
   font-size: 84px;
-  text-align: center;
   line-height: .85;
-  color: #000;
+  text-align: center;
   font-family: 'Signika', serif;
-
-
-  $white-shadow-color: #fff;
-  text-shadow:
-    // -1px -1px 0px $white-shadow-color,  
-    //  1px -1px 0px $white-shadow-color,
-    // -1px 1px 0px $white-shadow-color,
-     1px 1px 5px $white-shadow-color;
+  text-shadow: 1px 1px 5px $white;
 }
 
 .site-description {
   width: 300px;
   margin: 10px auto;
-  text-align: justify;
   line-height: 1.3;
+  text-align: justify;
   font-family: 'Open Sans', sans-serif;
 
   strong {
@@ -41,10 +39,11 @@
   }
 
   a {
+    color: $default_link_color;
     text-decoration: none;
 
     &:visited {
-      color: #00e;
+      color: $default_link_color;
     }
   }
 }
@@ -66,75 +65,63 @@
   right: -295px;
   width: 280px;
   height: 200px;
-  background-color: rgba(255, 255, 255, .20);
-  box-shadow: 1px 1px 2px #333;
-  border: 1px solid #000;
+  border: 1px solid $black;
   border-radius: 10px;
+  box-shadow: 1px 1px 2px $very-dark-gray;
+  background-color: $very-transparent-white;
   font-size: 16px;
-  overflow: scroll;
   font-family: 'Open Sans', sans-serif;
+  overflow: scroll;
 
   .message {
     width: 100%;
     margin: 5px 5px 0 5px;
-    color: #000;
+    color: $black;
 
     span {
       font-weight: bold;
     }
 
     .red {
-      color: #c00;
+      color: $med-bright-red;
     }
 
     .blue {
-      color: #00c;
+      color: $med-bright-blue;
     }
   }
 }
 
 .links-container {
-  margin: 25px auto;
   width: 300px;
+  margin: 25px auto;
   overflow: auto;
 
   a {
-    font-size: 16px;
     width: 120px;
     padding: 10px;
+    border: 2px solid $black;
     border-radius: 10px;
-
+    font-size: 16px;
     font-family: 'Open Sans', sans-serif;
     text-align: center;
-    color: #fff;
+    color: $white;
     text-decoration: none;
 
     &.ai {
       float: left;
-      background-color: #0a0;
-      border: 2px solid darken(#0a0, 10%);
+      background-color: $med-green;
+      border-color: $med-green-border;
     }
 
     &.human {
       float: right;
-      background-color: #00d;
-      border: 2px solid darken(#00d, 10%);
-    }
-
-    &:hover {
-
+      background-color: $brightish-blue;
+      border-color: $brightish-blue-border;
     }
   }
 }
 
 .splash-image {
-  position: absolute;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  background-size: cover;
-  background-image: url(image_path('chess_bg.jpg'));
-  -webkit-filter: blur(8px) grayscale(50%) brightness(130%);
-  filter: blur(8px) grayscale(50%) brightness(130%);
+  @include site_background_image(8px, 50%, 130%);
 }

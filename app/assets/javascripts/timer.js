@@ -1,29 +1,29 @@
-var Timer = function (){
+var TurnTracker = function (){
   this.initialize = function() {
-    this.turnTrackerEl = $('.turn-tracker');
+    this.turnMarkerEl = $('.turn-marker');
 
-    BoardListener.listen("piece.moved", this.toggleTurnTracker.bind(this));
-    BoardListener.listen("position.updated", this.toggleTurnTracker.bind(this));
-    BoardListener.listen("piece.unmoved", this.resetTurnTracker.bind(this));
+    BoardListener.listen("piece.moved", this.toggleTurnMarker.bind(this));
+    BoardListener.listen("position.updated", this.toggleTurnMarker.bind(this));
+    BoardListener.listen("piece.unmoved", this.resetTurnMarker.bind(this));
   };
   
-  this.toggleTurnTracker = function(data) {
-    this.turnTrackerEl.removeClass(data.color);
+  this.toggleTurnMarker = function(data) {
+    this.turnMarkerEl.removeClass(data.color);
 
     if (data.color === "red") {
-      this.turnTrackerEl.addClass("blue");
+      this.turnMarkerEl.addClass("blue");
     } else if (data.color === "blue") {
-      this.turnTrackerEl.addClass("red");
+      this.turnMarkerEl.addClass("red");
     }
   };
 
-  this.resetTurnTracker = function(data) {
-    this.turnTrackerEl.removeClass("red blue");
-    this.turnTrackerEl.addClass(data.color);
+  this.resetTurnMarker = function(data) {
+    this.turnMarkerEl.removeClass("red blue");
+    this.turnMarkerEl.addClass(data.color);
   }
 };
 
 
 $(document).on('turbolinks:load', function() {
-  var timer = new Timer().initialize();
+  var turnTracker = new TurnTracker().initialize();
 })

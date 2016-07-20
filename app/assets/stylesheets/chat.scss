@@ -1,26 +1,27 @@
-@import 'variables';
+@import 'colors';
+@import 'mixins';
 
 .chat {
   width: 223px;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .10);
-  box-shadow: 1px 1px 2px #333;
-  border: 1px solid #000;
+  height: 450px;
+  border: 1px solid $black;
   border-radius: 20px;
+  box-shadow: 1px 1px 2px $very-dark-gray;
+  background-color: $very-transparent-black;
   font-size: 16px;
 
   .messages {
-    height: 80%;
+    height: 360px;
     margin: 2px;
-    background-color: rgba(255, 255, 255, .20);
-    overflow: auto;
     border-radius: 15px 15px 0 0;
+    background-color: $very-transparent-white;
     font-family: 'Open Sans', sans-serif;
+    overflow: auto;
 
     .message {
-      width: 95%;
+      width: 208px;
       margin: 5px auto;
-      color: #333;
+      color: $very-dark-gray;
       word-wrap: break-word;
     }
   }
@@ -30,28 +31,18 @@
     height: 32px;
     margin: 5px;
     padding: 0;
-
-    border: 1px solid #000;
+    border: 1px solid $black;
     overflow: auto;
     outline: none;
-
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
     box-shadow: none;
     resize: none;
-
-    background-color: #eee;
+    background-color: $very-light-gray;
     font-family: 'Open Sans', sans-serif;
   }
 
-  button {
+  button.send {
+    @include button($orange);
     float: right;
     margin-right: 5px;
-    background-color: #f50;
-    border: 2px solid darken(#f50, 20%);
-    border-radius: 8px;
-    font-size: 16px;
-    font-family: 'Open Sans', sans-serif;
-    cursor: pointer;
   }
 }
