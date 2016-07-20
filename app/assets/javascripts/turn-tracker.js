@@ -2,9 +2,9 @@ var TurnTracker = function (){
   this.initialize = function() {
     this.turnMarkerEl = $('.turn-marker');
 
-    BoardListener.listen("piece.moved", this.toggleTurnMarker.bind(this));
-    BoardListener.listen("position.updated", this.toggleTurnMarker.bind(this));
-    BoardListener.listen("piece.unmoved", this.resetTurnMarker.bind(this));
+    EventsListener.listen("piece.moved", this.toggleTurnMarker.bind(this));
+    EventsListener.listen("position.updated", this.toggleTurnMarker.bind(this));
+    EventsListener.listen("piece.unmoved", this.resetTurnMarker.bind(this));
   };
   
   this.toggleTurnMarker = function(data) {

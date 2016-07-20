@@ -1,76 +1,58 @@
-var attachButtonHandlers = function() {
-  $("button.game.new-game").on('click', createNewGame);
-  $("button.game.offer-draw").on('click', offerDraw);
-  $("button.game.accept-draw").on('click', acceptDraw);
-};
-
-var createNewGame = function(event) {
-  if($(event.target).prop("disabled")) {
-    return;
-  }
-
-  var data = {
-    slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
+var GameButton = function(){
+  this.initialize = function() {
+    this.attachHandlers();
   };
 
-  $.post('/play/create/', data);
-  
-  disableNewGameButton();
-};
+  this.buttonClasses = [
+    "new-game",
+    "offer-draw",
+    "accept-draw"
+  ];
 
-var offerDraw = function(event) {
-  if($(event.target).prop("disabled")) {
-    return;
-  }
-
-  var data = {
-    slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
+  this.attachHandlers = function() {
+    $("button.game.new-game").on('click', this.createNewGame.bind(this));
+    $("button.game.offer-draw").on('click', this.offerDraw);
+    $("button.game.accept-draw").on('click', this.acceptDraw);
+    EventsListener.listen('button.modified', this.modifyButton.bind(this))
+    EventsListener.listen('enable.button', this.setActiveButton.bind(this))
   };
 
-  $.post('/play/offer-draw/', data);
-  
-  disableOfferDrawButton();
-};
-
-var acceptDraw = function(event) {
-  if($(event.target).prop("disabled")) {
-    return;
-  }
-
-  var data = {
-    slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
+  this.setActiveButton = function(data) {
+    _.each(this.buttonClasses, function(buttonClass) {
+      this.toggleGameButton(buttonClass, buttonClass === data.buttonClass);
+    }.bind(this));
   };
 
-  $.post('/play/accept-draw/', data);
-  
-  disableAcceptDrawButton();
-};
+  this.modifyButton = function(data) {
+    this.toggleGameButton(data.buttonClass, data.enable);
+  };
 
-var enableNewGameButton = function() {
-  $("button.new-game").prop("disabled", false);
-};
+  this.gameButtonAction = function(event, url, buttonClass) {
+    if($(event.target).prop("disabled")) {
+      return;
+    }
 
-var disableNewGameButton = function() {
-  $("button.new-game").prop("disabled", true);
-};
+    $.post(url, { slug: Helpers.getSlug() });
+    this.toggleGameButton(buttonClass, false);
+  };
 
-var enableOfferDrawButton = function () {
-  $("button.offer-draw").prop("disabled", false);
-};
+  this.createNewGame = function(event) {
+    this.gameButtonAction(event, '/play/create/', "new-game");
+  };
 
-var disableOfferDrawButton = function () {
-  $("button.offer-draw").prop("disabled", true);
-};
+  this.offerDraw = function(event) {
+    this.gameButtonAction(event, '/play/offer-draw/', "offer-draw");
+  };
 
-var enableAcceptDrawButton = function () {
-  $("button.accept-draw").prop("disabled", false);
-};
+  this.acceptDraw = function(event) {
+    this.gameButtonAction(event, '/play/accept-draw/', "accept-draw");
+  };
 
-var disableAcceptDrawButton = function () {
-  $("button.accept-draw").prop("disabled", true);
+  this.toggleGameButton = function(type, enabled) {
+    $("button." + type).prop("disabled", !enabled);
+  };
 };
-
 
 $(document).on('turbolinks:load', function() {
-  attachButtonHandlers();
+  new GameButton().initialize();
 });

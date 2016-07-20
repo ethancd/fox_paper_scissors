@@ -4,17 +4,17 @@ var Board = function(){
   };
 
   this.attachBoardHandlers =  function() {
-    BoardListener.listen("piece.clicked", this.highlightLegalSquares.bind(this));
+    EventsListener.listen("piece.clicked", this.highlightLegalSquares.bind(this));
 
     $('.node').on('click', function () {
       if($(this).hasClass("highlighted")) {
         $('.node').removeClass("highlighted");
-        BoardListener.send("node.clicked", { node: $(this)});
+        EventsListener.send("node.clicked", { node: $(this)});
       }
     });
 
     $('button.reset').on('click', function() {
-      BoardListener.send("reset")
+      EventsListener.send("reset")
     });
   };
 
@@ -56,5 +56,5 @@ var isAdjacent = function(pos1, pos2) {
 
 
 $(document).on('turbolinks:load', function() {
-  var board = new Board().initialize();
+  new Board().initialize();
 })

@@ -18,14 +18,12 @@ var gameSubscribe = function (slug) {
           break;
         case "position_update":
           setPiecesToPosition(data.position);
-          BoardListener.send("position.updated", {color: data.color});
-          enableOfferDrawButton();
-          disableAcceptDrawButton();
+          EventsListener.send("position.updated", {color: data.color});
+          EventsListener.send('enable.button', {buttonClass: "offer-draw"})
           break;
         case "checkmate":
           disablePieces();
-          disableOfferDrawButton();
-          enableNewGameButton();
+          EventsListener.send('enable.button', {buttonClass: "new-game"})
           addStarToWinner(data.winner);
           displayMessage(buildMessage({
             message: "Checkmate! " + data.winner + " wins!"
@@ -37,14 +35,12 @@ var gameSubscribe = function (slug) {
           }));
           
           if(data.offerer_id != current_player.user_id) {
-            disableOfferDrawButton();
-            enableAcceptDrawButton();
+            EventsListener.send('enable.button', {buttonClass: "accept-draw"})
           }
           break;
         case "draw_accepted":
           disablePieces();
-          enableNewGameButton();
-          disableOfferDrawButton();
+          EventsListener.send('enable.button', {buttonClass: "new-game"})
           displayMessage(buildMessage({
             message: "It's an agreed-upon draw."
           }));
@@ -55,20 +51,13 @@ var gameSubscribe = function (slug) {
             }));
           break;
         case "player_swap":
-          disableNewGameButton();
-          enableOfferDrawButton();
+          EventsListener.send('enable.button', {buttonClass: "offer-draw"})
           swapPlayers();
           break;
       };
     }
   });
 }
-
-var getSlug = function() {
-  var match = window.location.pathname.match(/[0-9|a-f]{8}/);
-
-  return match && match[0];
-};
 
 var addStarToWinner = function (winner) {
   var $winnerNameEl = $('.player-name').filter(function() {
@@ -92,7 +81,7 @@ var playerJoinedGame = function(data) {
         message: "Share this page's url with a friend to start playing: " + window.location
       }));
     } else {
-      enableOfferDrawButton();
+      EventsListener.send('enable.button', {buttonClass: "offer-draw"})
     }
     return;
   }
@@ -105,7 +94,7 @@ var playerJoinedGame = function(data) {
 
   setPiecesToPosition(data.position);
   setPlayerName(new_player);
-  enableOfferDrawButton();
+  EventsListener.send('enable.button', {buttonClass: "offer-draw"})
 };
 
 var swapPlayers = function() {
@@ -122,7 +111,7 @@ var swapPlayers = function() {
 };
 
 $(document).on('turbolinks:load', function() {
-  var slug = getSlug();
+  var slug = Helpers.getSlug();
   if (slug) {
     gameSubscribe(slug);
   }

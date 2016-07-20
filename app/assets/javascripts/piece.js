@@ -24,10 +24,10 @@ var Piece = function(color, type, position){
   };
 
   this.attachPieceHandlers = function() {
-    BoardListener.listen("node.clicked", this.submitMove.bind(this));
-    BoardListener.listen("reset", this.resetPiece.bind(this));
-    BoardListener.listen("check.threatened", this.checkThreatened.bind(this));
-    BoardListener.listen("position.updated", this.checkThreatened.bind(this));
+    EventsListener.listen("node.clicked", this.submitMove.bind(this));
+    EventsListener.listen("reset", this.resetPiece.bind(this));
+    EventsListener.listen("check.threatened", this.checkThreatened.bind(this));
+    EventsListener.listen("position.updated", this.checkThreatened.bind(this));
 
     this.$el.on('click', function() {
       if (current_player && (current_player.first ? this.color === "red" : this.color === "blue")) {
@@ -44,7 +44,7 @@ var Piece = function(color, type, position){
     this.$el.toggleClass("highlighted")
     $('.piece').not(this.$el).removeClass("highlighted");
 
-    BoardListener.send("piece.clicked", {
+    EventsListener.send("piece.clicked", {
       piece: this,
       active: this.$el.hasClass("highlighted")
     });
@@ -59,7 +59,7 @@ var Piece = function(color, type, position){
     var turn = $(".turn-marker").hasClass("red") ? "red" : "blue";
 
     var data = {
-      slug: window.location.pathname.match(/[0-9|a-f]{8}/)[0],
+      slug: Helpers.getSlug(),
       move: {
         target: target,
         piece: this.position
@@ -86,7 +86,7 @@ var Piece = function(color, type, position){
     this.priorPosition = this.position;
     this.position = target;
     this.moveToPosition();
-    BoardListener.send("piece.moved", {color: this.color});
+    EventsListener.send("piece.moved", {color: this.color});
 
     this.$el.removeClass("highlighted")
   };
@@ -95,7 +95,7 @@ var Piece = function(color, type, position){
     this.position = this.priorPosition;
     this.moveToPosition();
 
-    BoardListener.send("piece.unmoved", {color: this.color})
+    EventsListener.send("piece.unmoved", {color: this.color})
   }
 
   this.moveToPosition = function() {
@@ -107,7 +107,7 @@ var Piece = function(color, type, position){
     this.$el.detach();
     $target.append(this.$el);
 
-    BoardListener.send("check.threatened");
+    EventsListener.send("check.threatened");
   };
 
   this.resetPiece = function() {
