@@ -15,6 +15,14 @@ var GameButton = function(){
     $("button.game.accept-draw").on('click', this.acceptDraw.bind(this));
     EventsListener.listen('button.modified', this.modifyButton.bind(this))
     EventsListener.listen('enable.button', this.setActiveButton.bind(this))
+
+    EventsListener.listen("game.over", function() {
+      this.setActiveButton({ buttonClass: "new-game"})
+    }.bind(this));
+
+    EventsListener.listen("position.updated", function() {
+      this.setActiveButton({ buttonClass: "offer-draw"})
+    }.bind(this));
   };
 
   this.setActiveButton = function(data) {

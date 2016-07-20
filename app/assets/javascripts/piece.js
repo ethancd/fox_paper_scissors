@@ -28,6 +28,7 @@ var Piece = function(color, type, position){
     EventsListener.listen("reset", this.resetPiece.bind(this));
     EventsListener.listen("check.threatened", this.checkThreatened.bind(this));
     EventsListener.listen("position.updated", this.checkThreatened.bind(this));
+    EventsListener.listen("piece.launched", this.launchPiece.bind(this));
 
     this.$el.on('click', function() {
       if (current_player && current_player.color === this.color) {
@@ -36,6 +37,17 @@ var Piece = function(color, type, position){
     }.bind(this));
   };
 
+  this.launchPiece = function(data) {
+    var delta = data.delta;
+    var origin = getCoords(delta[0]);
+    var target = getCoords(delta[delta.length - 1]);
+
+    if (this.isInSpace(origin)) {
+      this.highlight(true);
+      this.delayedMove(target, data.tickMs);
+    } 
+  }
+
   this.highlight = function(skipValidation) {
     if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-marker')) || this.$el.prop("disabled")) {
       return;
@@ -43,11 +55,34 @@ var Piece = function(color, type, position){
 
     this.$el.toggleClass("highlighted")
     $('.piece').not(this.$el).removeClass("highlighted");
+    $('.node').removeClass("highlighted");
 
-    EventsListener.send("piece.clicked", {
-      piece: this,
-      active: this.$el.hasClass("highlighted")
-    });
+    if(this.$el.hasClass("highlighted") && this.isMobile()) {
+      var legalNodes = this.getLegalNodes();
+      EventsListener.send("piece.clicked", { nodes: legalNodes });
+    }
+  };
+
+  this.getLegalNodes = function() {
+    return $('.node').filter(this.isLegalNode.bind(this));
+  };
+
+  this.isLegalNode = function(i, node) {
+    var occupied = $(node).children().length;
+    var space = Helpers.getPositionFromNode($(node));
+    var adjacent = this.isAdjacent(space);
+    var threatened = this.getEnemy().isAdjacent(space);
+
+    return !occupied && adjacent && !threatened; 
+  };
+
+  this.isAdjacent = function(space) {
+    var distance = (Math.abs(this.position[0] - space[0]) + Math.abs(this.position[1] - space[1]));
+    return distance === 2;
+  };
+
+  this.isInSpace = function(position) {
+    return _.isEqual(this.position, position);
   };
 
   this.submitMove = function(data) {
@@ -55,7 +90,7 @@ var Piece = function(color, type, position){
       return;
     }
 
-    var target = getPosition(data.node);
+    var target = Helpers.getPositionFromNode(data.node);
     var turn = $(".turn-marker").hasClass("red") ? "red" : "blue";
 
     var data = {
@@ -100,8 +135,8 @@ var Piece = function(color, type, position){
 
   this.moveToPosition = function() {
     var $target = $('.node').filter(function(i, el) {
-      var coords = getPosition($(el));
-      return isSameSpace(this.position, coords);
+      var coords = Helpers.getPositionFromNode($(el));
+      return this.isInSpace(coords);
     }.bind(this))
 
     this.$el.detach();
@@ -151,9 +186,7 @@ var Piece = function(color, type, position){
   }
 
   this.isThreatened = function () {
-    var enemy = this.getEnemy();
-
-    return isAdjacent(this.position, enemy.position);
+    return this.isAdjacent(this.getEnemy().position);
   };
 
   this.getEnemy = function () {
@@ -164,54 +197,6 @@ var Piece = function(color, type, position){
       return piece.color == enemyColor && piece.type == enemyType;
     });
   };
-};
-
-var getThreatenedPieces = function (activeColor) {
-  return _.filter(Pieces, function(piece) {
-    return piece.color === activeColor && piece.isThreatened();
-  });
-};
-
-var getPosition = function(node) {
-  return node.attr("id").match(/\d/g);
-}
-
-var getPieceData = function() {
-  var pieceData = [];
-
-  for (var i = 0; i < Pieces.length; i++) {
-    var piece = Pieces[i];
-
-    pieceData.push(piece.serialize())
-  }
-
-  return pieceData;
-}
-
-var setPiecesToPosition = function(position) {
-  enablePieces();
-  for (var i = 0; i < Pieces.length; i++) {
-    var piece = Pieces[i]
-    coords = getCoords(position[i]);
-    piece.position = coords;
-    piece.moveToPosition();
-  }
-};
-
-var disablePieces = function() {
-  $('.piece').prop("disabled", true);
-};
-
-var enablePieces = function() {
-  $('.piece').prop("disabled", false);
-};
-
-var initializePieces = function() { 
-  for (var i = 0; i < Pieces.length; i++) {
-    var pieceData = Pieces[i]
-    var piece = new Piece(pieceData.color, pieceData.type, pieceData.position).initialize();
-    Pieces[i] = piece;
-  }
 };
 
 var getCoords = function(letter) {
@@ -247,31 +232,6 @@ var getCoords = function(letter) {
 
   return coords[index];
 }
-
-var isSameSpace = function(pos1, pos2) {
-  for (var i = 0; i < pos1.length; i++) {
-    if (parseInt(pos1[i]) !== parseInt(pos2[i])) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-var createHtmlPieces = function() {
-  for (var i = 0; i < Pieces.length; i++) {
-    var pieceData = Pieces[i]
-    var $pieceEl = $("<div>", {"class": "piece " + pieceData.color + " " + pieceData.type });
-    
-    var $target = $('.node').filter(function(i, el) {
-      var coords = getPosition($(el));
-      return isSameSpace(pieceData.position, coords);
-    }.bind(this))
-
-    $target.append($pieceEl);
-  }
-}
-
 
 $(document).on('turbolinks:load', function () {
   initializePieces();

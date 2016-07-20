@@ -1,197 +1,137 @@
-var tickMs = 3000;
+var Tutorial = function(){
+  this.initialize = function() {
+    EventsListener.listen('tutorial.chat.ready', this.runTutorial.bind(this));
+  };
 
-var runTutorial = function(exampleGames) {
-  var gameCounter = 0;
-  var moveCounter = 0;
-  tutorialEnded = false;
+  this.tickMs = 3000;
+  this.gameCounter = 0;
+  this.moveCounter = 0;
 
-  displayTutorialMessage(buildTutorialMessage("<span>Demo Game 1:</span>"));
+  this.runTutorial = function() {
+    EventsListener.send('tutorial.message', { text: this.getGameTitle(), tickMs: 0 });
+    setTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
+  };
 
-  setTimeout(function() {
-    tickTutorial(exampleGames, gameCounter, moveCounter);
-  }, tickMs / 2)
-}
+  this.tickTutorial = function () {
+    var exampleGame = this.exampleGames[this.gameCounter];
+    var move = exampleGame[this.moveCounter][0];
+    var message = exampleGame[this.moveCounter][1];
 
-var tickTutorial = function (exampleGames, gameCounter, moveCounter) {
-  if (tutorialEnded) {
-    return;
-  }
+    this.executeTutorialStep(move, message);
+    this.moveCounter++;
+    this.setUpNextAction(exampleGame);
+  };
 
-  var exampleGame = exampleGames[gameCounter];
-  executeTutorialStep(exampleGame.moves[moveCounter]);
-  publishTutorialMessage(exampleGame.messages[moveCounter]);
-  moveCounter++;
-
-  if (moveCounter >= exampleGame.moves.length) {
-    moveCounter = 0;
-    gameCounter++;
-
-    if (gameCounter >= exampleGames.length) {
-      gameCounter = 0;
+  this.setUpNextAction = function (exampleGame) {
+    if (this.moveCounter >= _.size(exampleGame)) {
+      this.resetCounters();
+      this.startNewGame();
+    } else {
+      setTimeout(this.tickTutorial.bind(this), this.tickMs);
     }
+  };
 
-    setTimeout(function() {
-      setPiecesToPosition(startingPosition)
-      displayTutorialMessage(buildTutorialMessage("<span>Demo Game " + (gameCounter + 1) + ":</span>"));
+  this.resetCounters = function () {
+    this.moveCounter = 0;
+    this.gameCounter++;
 
-      setTimeout(function() {
-        tickTutorial(exampleGames, gameCounter, moveCounter);
-      }, tickMs)
-    }, tickMs * 2)
-  } else {
-    setTimeout(function() {
-      tickTutorial(exampleGames, gameCounter, moveCounter);
-    }, tickMs);
-  }
+    if (this.gameCounter >= this.exampleGames.length) {
+      this.gameCounter = 0;
+    }
+  };
+
+  this.startNewGame = function() {
+    EventsListener.send('tutorial.message', { text: this.getGameTitle(), tickMs: this.tickMs * 2 });
+
+    setTimeout(setPiecesToPosition.bind(this, startingPosition), this.tickMs * 2);
+    setTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
+  };
+
+  this.executeTutorialStep = function(move, message) {
+    EventsListener.send('piece.launched', { delta: move, tickMs: this.tickMs / 3 })
+    EventsListener.send('tutorial.message', { text: message, tickMs: this.tickMs / 3 });
+  };
+
+  this.getGameTitle = function() {
+    return "<span>Demo Game " + (this.gameCounter + 1) + ":</span>";
+  };
+
+  this.getCommentary = function(activePieceDescription, passivePieceDescription, checkmate) {
+    var firstSpan = this.buildSpan.apply(this, activePieceDescription.split(" "));
+    var secondSpan = this.buildSpan.apply(this, passivePieceDescription.split(" "));
+    var action = checkmate ? "checkmate!" : "check."
+
+    return firstSpan + " puts " + secondSpan + " in " + action;
+  };
+
+  this.buildSpan = function(color, type) {
+    var capitalizedColor = this.capitalizeString(color);
+    var capitalizedType = this.capitalizeString(type);
+    var firstTag = "<span class='" + color + "'>";
+    var text = capitalizedColor + " " + capitalizedType;
+    var secondTag = "</span>";
+
+    return firstTag + text + secondTag;
+  };
+
+  this.capitalizeString = function (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  };
+
+  this.quickBlueScissorsWin = [
+    ["h_i", ""],
+    ["r_q", ""],
+    ["b_f", ""],
+    ["q_m", this.getCommentary("blue scissors", "red paper")],
+    ["i_e", ""],
+    ["m_i", this.getCommentary("blue scissors", "red paper", true)]
+  ];
+
+  this.mediumRedRockWin = [
+    ["b_f", ""],
+    ["r_q", ""],
+    ["a_e", ""],
+    ["q_m", ""],
+    ["e_i", this.getCommentary("red rock", "blue scissors")],
+    ["m_t", ""],
+    ["i_p", this.getCommentary("red rock", "blue scissors")],
+    ["t_u", ""],
+    ["f_m", ""],
+    ["x_w", this.getCommentary("blue paper", "red rock")],
+    ["p_q", this.getCommentary("red rock", "blue scissors", true)]
+  ];
+
+  this.longMirrorOpeningRedWin = [
+    ["a_e", ""],
+    ["y_u", ""],
+    ["h_l", ""],
+    ["x_t", ""],
+    ["b_i", ""],
+    ["r_q", ""],
+    ["i_p", this.getCommentary("red scissors", "blue paper")],
+    ["t_x", ""],
+    ["e_i", ""],
+    ["u_t", this.getCommentary("blue rock", "red scissors")],
+    ["p_o", ""],
+    ["x_u", ""],
+    ["i_m", this.getCommentary("red rock", "blue scissors")],
+    ["q_r", ""],
+    ["l_p", this.getCommentary("red paper", "blue rock")],
+    ["t_x", ""],
+    ["p_t", this.getCommentary("red paper", "blue rock")],
+    ["x_y", ""],
+    ["t_x", this.getCommentary("red paper", "blue rock", true)]
+  ];
+
+  this.exampleGames = [
+    this.quickBlueScissorsWin,
+    this.mediumRedRockWin,
+    this.longMirrorOpeningRedWin
+  ];
 };
-
-var executeTutorialStep = function(delta) {
-  var origin = getCoords(delta[0]);
-  var target = getCoords(delta[delta.length - 1]);
-  var piece = findPieceByPosition(origin);
-
-  piece.highlight(true);
-  piece.delayedMove(target, tickMs / 3);
-};
-
-var findPieceByPosition = function(position) {
-  return Pieces.find(function(p) {
-    return isSameSpace(position, p.position);
-  });
-};
-
-var publishTutorialMessage = function(message) {
-  if(!message) {
-    return;
-  }
-  var messageNode = buildTutorialMessage(message);
-
-  setTimeout(function() {
-    displayTutorialMessage(messageNode);
-  }, tickMs / 3);
-};
-
-var displayTutorialMessage = function(messageNode) {
-  $(".tutorial-messages").append(messageNode)
-  $(".tutorial-messages").animate({scrollTop: $('.tutorial-messages').prop("scrollHeight")}, 500)
-}
-
-var buildTutorialMessage = function(message) {
-  var $el = $("<li/>", {
-    class: "message"
-  });
-
-  $el.html(message);
-  return $el;
-};
-
-var exampleGameQuickBlueScissorsWin = {
-  moves: [
-    "h_i",
-    "r_q",
-    "b_f",
-    "q_m",
-    "i_e",
-    "m_i"
-  ],
-  messages: [
-    "",
-    "",
-    "",
-    "<span class='blue'>Blue Scissors</span> puts <span class='red'>Red Paper</span> in check.",
-    "",
-    "<span class='blue'>Blue Scissors</span> puts <span class='red'>Red Paper</span> in checkmate!",
-  ]
-};
-
-var exampleGameMediumRedRockWin = {
-  moves: [
-    "b_f",
-    "r_q",
-    "a_e",
-    "q_m",
-    "e_i",
-    "m_t",
-    "i_p",
-    "t_u",
-    "f_m",
-    "x_w",
-    "p_q"
-  ],
-  messages: [
-    "",
-    "",
-    "",
-    "",
-    "<span class='red'>Red Rock</span> puts <span class='blue'>Blue Scissors</span> in check.",
-    "",
-    "<span class='red'>Red Rock</span> puts <span class='blue'>Blue Scissors</span> in check.",
-    "",
-    "",
-    "<span class='blue'>Blue Paper</span> puts <span class='red'>Red Rock</span> in check.",
-    "<span class='red'>Red Rock</span> puts <span class='blue'>Blue Scissors</span> in checkmate!",
-  ]
-};
-
-var exampleGameLongMirrorOpeningRedWin = {
-  moves: [
-    "a_e",
-    "y_u",
-    "h_l",
-    "x_t",
-    "b_i",
-    "r_q",
-    "i_p",
-    "t_x",
-    "e_i",
-    "u_t",
-    "p_o",
-    "x_u",
-    "i_m",
-    "q_r",
-    "l_p",
-    "t_x",
-    "p_t",
-    "x_y",
-    "t_x"
-  ],
-  messages: [
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "<span class='red'>Red Scissors</span> puts <span class='blue'>Blue Paper</span> in check.",
-    "",
-    "",
-    "<span class='blue'>Blue Rock</span> puts <span class='red'>Red Scissors</span> in check.",
-    "",
-    "",
-    "<span class='red'>Red Rock</span> puts <span class='blue'>Blue Scissors</span> in check.",
-    "",
-    "<span class='red'>Red Paper</span> puts <span class='blue'>Blue Rock</span> in check.",
-    "",
-    "<span class='red'>Red Paper</span> puts <span class='blue'>Blue Rock</span> in check.",
-    "",
-    "<span class='red'>Red Paper</span> puts <span class='blue'>Blue Rock</span> in checkmate!",
-  ]
-};
-
-var exampleGames = [
-  exampleGameQuickBlueScissorsWin,
-  exampleGameMediumRedRockWin,
-  exampleGameLongMirrorOpeningRedWin
-];
-
-var endTutorial = function () {
-  tutorialEnded = true;
-}
 
 $(document).on('turbolinks:load', function () {
   if ($('.tutorial-area').length) {
-    runTutorial(exampleGames);
-  } else {
-    endTutorial();
+    new Tutorial().initialize();
   }
 })

@@ -4,54 +4,85 @@ var Board = function(){
   };
 
   this.attachHandlers =  function() {
-    EventsListener.listen("piece.clicked", this.highlightLegalSquares.bind(this));
+    $('.node').on('click', this.nodeClicked);
 
-    $('.node').on('click', function () {
-      if($(this).hasClass("highlighted")) {
-        $('.node').removeClass("highlighted");
-        EventsListener.send("node.clicked", { node: $(this)});
-      }
-    });
-
-    $('button.reset').on('click', function() {
-      EventsListener.send("reset")
-    });
+    EventsListener.listen("piece.clicked", this.highlightLegalNodes.bind(this));
+    EventsListener.listen("game.over", disablePieces);
+    EventsListener.listen("position.updated", setPiecesByData);
   };
 
-  this.highlightLegalSquares = function(data) {
-    $('.node').removeClass("highlighted");
-
-    if(!data.active) {
-      return;
+  this.nodeClicked = function() {
+    if($(this).hasClass("highlighted")) {
+      $('.node').removeClass("highlighted");
+      EventsListener.send("node.clicked", { node: $(this)});
     }
+  }
 
-    var piece = data.piece;
-
-    if(!piece.isMobile()) {
-      return;
-    }
-
-    var enemy = piece.getEnemy();
-
-    $('.node').each(function(i, el) {
-      if ($(el).children().length) {
-        return;
-      }
-
-      var coords = $(el).attr("id").match(/\d/g);
-      var adjacent = isAdjacent(coords, piece.position);
-      var threatened = isAdjacent(coords, enemy.position);
-
-      if(adjacent && !threatened) {
-        $(el).addClass("highlighted");
-      }
-    }.bind(this));
-
+  this.highlightLegalNodes = function(data) {
+    $(data.nodes).addClass("highlighted");
   };
 };
 
-var isAdjacent = function(pos1, pos2) {
-  return 2 == (Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]))
+var getThreatenedPieces = function (activeColor) {
+  return _.filter(Pieces, function(piece) {
+    return piece.color === activeColor && piece.isThreatened();
+  });
+};
+
+var getPieceData = function() {
+  var pieceData = [];
+
+  for (var i = 0; i < Pieces.length; i++) {
+    var piece = Pieces[i];
+
+    pieceData.push(piece.serialize())
+  }
+
+  return pieceData;
+}
+
+var setPiecesByData = function(data) {
+  setPiecesToPosition(data.position);
+};
+
+var setPiecesToPosition = function(position) {
+  enablePieces();
+  for (var i = 0; i < Pieces.length; i++) {
+    var piece = Pieces[i]
+    coords = getCoords(position[i]);
+    piece.position = coords;
+    piece.moveToPosition();
+  }
+};
+
+var disablePieces = function() {
+  $('.piece').prop("disabled", true);
+};
+
+var enablePieces = function() {
+  $('.piece').prop("disabled", false);
+};
+
+var initializePieces = function() { 
+  for (var i = 0; i < Pieces.length; i++) {
+    var pieceData = Pieces[i]
+    var piece = new Piece(pieceData.color, pieceData.type, pieceData.position).initialize();
+    Pieces[i] = piece;
+  }
+};
+
+var createHtmlPieces = function() {
+  for (var i = 0; i < Pieces.length; i++) {
+    var pieceData = Pieces[i]
+    var $pieceEl = $("<div>", {"class": "piece " + pieceData.color + " " + pieceData.type });
+    
+    var $target = $('.node').filter(function(i, el) {
+      var coords = Helpers.getPositionFromNode($(el));
+      return _.isEqual(pieceData.position, coords);
+    }.bind(this))
+
+    $target.append($pieceEl);
+  }
 }
 
 

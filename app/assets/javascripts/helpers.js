@@ -11,5 +11,9 @@ var Helpers = {
     if (color === "blue"){
       return "red";
     }
+  },
+  getPositionFromNode: function(node) {
+    var stringCoords = node.attr("id").match(/\d/g);
+    return _.map(stringCoords, _.parseInt);
   }
 };

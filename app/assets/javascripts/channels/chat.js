@@ -7,6 +7,9 @@ var attachChatHandlers = function() {
   });
 
   $(".chat button.send").on('click', send);
+  EventsListener.listen("chat.message", function(data) {
+    displayMessage(buildMessage(data));
+  });
 };
 
 var send = function () {
@@ -25,12 +28,13 @@ var send = function () {
 
 var displayMessage = function(messageNode) {
   $(".chat .messages").append(messageNode)
-}
+  $(".chat .messages").animate({scrollTop: $('.chat .messages').prop("scrollHeight")}, 500)
+};
 
 var buildMessage = function(data) {
   var $el = $("<li/>", {
     class: "message",
-    text: data.message
+    text: data.text
   });
 
   if (data.color) {
