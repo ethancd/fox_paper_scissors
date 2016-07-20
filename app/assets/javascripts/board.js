@@ -1,14 +1,47 @@
-var Board = function(){
+var Board = function($el){
   this.initialize = function() {
+    this.$el = $el;
     this.attachHandlers();
+    this.initializePieces({position: StartingPosition});
   };
+
+  this.pieceColors = [ "red", "blue"];
+  this.pieceTypes = ["rock", "paper", "scissors"];
 
   this.attachHandlers =  function() {
     $('.node').on('click', this.nodeClicked);
 
     EventsListener.listen("piece.clicked", this.highlightLegalNodes.bind(this));
-    EventsListener.listen("game.over", disablePieces);
-    EventsListener.listen("position.updated", setPiecesByData);
+    EventsListener.listen("game.over", this.disablePieces.bind(this));
+    EventsListener.listen("position.updated", this.setPieces.bind(this));
+    EventsListener.listen("board.initialized", this.initializePieces.bind(this));
+  };
+
+  this.initializePieces = function(data) {
+    this.pieces = [];
+
+    var i = 0;
+    _.each(this.pieceColors, function(color) {
+      _.each(this.pieceTypes, function(type) {
+        var options = {
+          color: color,
+          type: type,
+          position: Helpers.getCoordinatesFromLetter(data.position[i])
+        };
+
+        var $piece = this.findOrCreatePiece('.piece.' + color + '.' + type, options.position);
+        var piece = new Piece(options, $piece, this).initialize();
+
+        this.pieces.push(piece);
+        i++;
+      }.bind(this));
+    }.bind(this));
+  };
+
+  this.getThreatenedPieces = function (activeColor) {
+    return _.filter(this.pieces, function(piece) {
+      return piece.color === activeColor && piece.isThreatened();
+    });
   };
 
   this.nodeClicked = function() {
@@ -16,76 +49,52 @@ var Board = function(){
       $('.node').removeClass("highlighted");
       EventsListener.send("node.clicked", { node: $(this)});
     }
-  }
+  };
 
   this.highlightLegalNodes = function(data) {
     $(data.nodes).addClass("highlighted");
   };
-};
 
-var getThreatenedPieces = function (activeColor) {
-  return _.filter(Pieces, function(piece) {
-    return piece.color === activeColor && piece.isThreatened();
-  });
-};
+  this.disablePieces = function() {
+    _.each(this.pieces, disable);
+  };
 
-var getPieceData = function() {
-  var pieceData = [];
+  this.enablePieces = function() {
+    _.each(this.pieces, enable);
+  };
 
-  for (var i = 0; i < Pieces.length; i++) {
-    var piece = Pieces[i];
+  this.setPiecesToPosition = function(data) {
+    this.enablePieces();
 
-    pieceData.push(piece.serialize())
-  }
+    _.each(this.pieces, function(piece, i) {
+      piece.position = Helpers.getCoordinatesFromLetter(data.position[i]);
+      piece.moveToPosition();
+    });
+  };
 
-  return pieceData;
-}
+  this.findOrCreatePiece = function(description, position) {
+    var $piece = this.$el.find(description);
 
-var setPiecesByData = function(data) {
-  setPiecesToPosition(data.position);
-};
+    if (!$piece.length) {
+      $piece = $("<div>", {"class": description});
+      this.appendPieceToTarget($piece, position);
+    }
 
-var setPiecesToPosition = function(position) {
-  enablePieces();
-  for (var i = 0; i < Pieces.length; i++) {
-    var piece = Pieces[i]
-    coords = getCoords(position[i]);
-    piece.position = coords;
-    piece.moveToPosition();
-  }
-};
+    return $piece;
+  };
 
-var disablePieces = function() {
-  $('.piece').prop("disabled", true);
-};
-
-var enablePieces = function() {
-  $('.piece').prop("disabled", false);
-};
-
-var initializePieces = function() { 
-  for (var i = 0; i < Pieces.length; i++) {
-    var pieceData = Pieces[i]
-    var piece = new Piece(pieceData.color, pieceData.type, pieceData.position).initialize();
-    Pieces[i] = piece;
-  }
-};
-
-var createHtmlPieces = function() {
-  for (var i = 0; i < Pieces.length; i++) {
-    var pieceData = Pieces[i]
-    var $pieceEl = $("<div>", {"class": "piece " + pieceData.color + " " + pieceData.type });
-    
+  this.appendPieceToTarget = function($piece, position) {
     var $target = $('.node').filter(function(i, el) {
       var coords = Helpers.getPositionFromNode($(el));
       return _.isEqual(pieceData.position, coords);
     }.bind(this))
 
-    $target.append($pieceEl);
-  }
-}
-
+    $target.append($piece);
+  };
+};
 
 $(document).on('turbolinks:load', function() {
-  new Board().initialize();
+  if($('.board').length) {
+    new Board($('.board')).initialize();
+  }
 })

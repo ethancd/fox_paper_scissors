@@ -6,7 +6,7 @@ class MessageController < ApplicationController
 
     ActionCable.server.broadcast("chat_#{params[:chat_id]}", {
       action: "new_message",
-      message: @message.get_formatted_text,
+      text: @message.get_formatted_text,
       color: @message.get_color
     })
   end

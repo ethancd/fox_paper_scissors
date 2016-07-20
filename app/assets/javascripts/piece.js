@@ -1,15 +1,15 @@
 //temporary i hope hope hope
 //leaving it for react to deal with! hahaha
 
-var Piece = function(color, type, position){
+var Piece = function(options, $el, board){
   this.initialize = function() {
-    this.$el = $("." + color + "." + type);
+    this.$el = $el;
+    this.board = board;
 
-    this.color = color;
-    this.type = type;
-
-    this.originalPosition = position;
-    this.position = position;
+    this.color = options.color;
+    this.type = options.type;
+    this.originalPosition = options.position;
+    this.position = options.position;
 
     this.moveToPosition();
     this.attachPieceHandlers();
@@ -39,8 +39,8 @@ var Piece = function(color, type, position){
 
   this.launchPiece = function(data) {
     var delta = data.delta;
-    var origin = getCoords(delta[0]);
-    var target = getCoords(delta[delta.length - 1]);
+    var origin = Helpers.getCoordinatesFromLetter(delta[0]);
+    var target = Helpers.getCoordinatesFromLetter(delta[delta.length - 1]);
 
     if (this.isInSpace(origin)) {
       this.highlight(true);
@@ -168,7 +168,7 @@ var Piece = function(color, type, position){
   };
 
   this.isMobile = function () {
-    var threatenedPieces = getThreatenedPieces(this.color);
+    var threatenedPieces = this.board.getThreatenedPieces(this.color);
 
     if (!threatenedPieces.length) {
       return true;
@@ -197,41 +197,15 @@ var Piece = function(color, type, position){
       return piece.color == enemyColor && piece.type == enemyType;
     });
   };
+
+  this.disable = function () {
+    this.$el.prop("disabled", true);
+  };
+
+  this.enable = function () {
+    this.$el.prop("disabled", false);
+  };
 };
-
-var getCoords = function(letter) {
-  var base = "a".charCodeAt(0);
-  var index = letter.charCodeAt(0) - base;
-  var coords = [
-      [0,0],
-      [2,0],
-      [4,0],
-      [6,0],
-      [1,1],
-      [3,1],
-      [5,1],
-      [0,2],
-      [2,2],
-      [4,2],
-      [6,2],
-      [1,3],
-      [3,3],
-      [5,3],
-      [0,4],
-      [2,4],
-      [4,4],
-      [6,4],
-      [1,5],
-      [3,5],
-      [5,5],
-      [0,6],
-      [2,6],
-      [4,6],
-      [6,6]
-  ];
-
-  return coords[index];
-}
 
 $(document).on('turbolinks:load', function () {
   initializePieces();

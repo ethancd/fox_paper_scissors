@@ -39,8 +39,8 @@ var PlayerNames = function(){
     return current_player.user_id === player.user_id ? "You" : "Them";
   };
 
-  this.samePlayer = function(data) {
-    return current_player && current_player.user_id === new_player.user_id;
+  this.samePlayer = function(newPlayer) {
+    return current_player && current_player.user_id === newPlayer.user_id;
   };
 
   this.tellUserToShare = function() {
@@ -56,20 +56,17 @@ var PlayerNames = function(){
       return;
     }
 
-    if(this.samePlayer(data)) {
+    if(this.samePlayer(newPlayer)) {
       this.tellUserToShare();
       return;
     }
 
-    this.setPlayerName(newPlayer);
-
-    if(data.pieces) {
-      Pieces = JSON.parse(data.pieces);
-      createHtmlPieces();
-      initializePieces();
+    if(data.position) {
+      EventsListener.send('board.initialized', {position: data.position})
     }
 
-    EventsListener.send('position.updated', {position: data.position, color: Helpers.swapColor(newPlayer.color)})
+    this.setPlayerName(newPlayer);
+    EventsListener.send('position.updated', {position: data.position, color: "red"})
   };
 
   this.swapPlayers = function() {

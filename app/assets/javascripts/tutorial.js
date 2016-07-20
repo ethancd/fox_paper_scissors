@@ -3,6 +3,7 @@ var Tutorial = function(){
     EventsListener.listen('tutorial.chat.ready', this.runTutorial.bind(this));
   };
 
+  this.startingPosition = "ahbyxr"
   this.tickMs = 3000;
   this.gameCounter = 0;
   this.moveCounter = 0;
@@ -43,7 +44,10 @@ var Tutorial = function(){
   this.startNewGame = function() {
     EventsListener.send('tutorial.message', { text: this.getGameTitle(), tickMs: this.tickMs * 2 });
 
-    setTimeout(setPiecesToPosition.bind(this, startingPosition), this.tickMs * 2);
+    setTimeout(function() {
+      EventsListener.send('position.updated', { position: this.startingPosition });
+    }.bind(this), this.tickMs * 2);
+    
     setTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
   };
 

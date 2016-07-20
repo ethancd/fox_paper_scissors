@@ -1,5 +1,9 @@
 <div class="chat" id="<%= chat.id %>">
-  <ul class="messages"></ul>
+  <ul class="messages">
+    <% chat.messages.each do |message| %>
+      <li class="message"><%= message %></li>
+    <% end %>
+  </ul>
   <textarea></textarea>
   <%= render "shared/game_buttons" %>
   <button class="send">Send</button>

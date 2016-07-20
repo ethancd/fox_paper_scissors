@@ -3,7 +3,7 @@ module AI
 
   attr_accessor :fuzzy
 
-  AI_SEARCH_DEPTH = 3
+  AI_SEARCH_DEPTH = 6
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
 
   def move(board_position, side, options = {})

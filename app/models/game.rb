@@ -21,14 +21,14 @@ class Game < ApplicationRecord
     end
   end
 
-  def broadcast_position_update(new_move_color)
+  def broadcast_position_update(last_moved_color)
+    next_color = last_moved_color == "red" ? "blue" : "red"
+
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "position_update", 
       position: self.board.position,
-      color: new_move_color
+      color: next_color
     }
-
-    next_color = new_move_color == "red" ? "blue" : "red"
 
     if self.board.checkmate?(next_color)
       broadcast_checkmate(next_color)
@@ -46,7 +46,7 @@ class Game < ApplicationRecord
   end
 
   def broadcast_new_game
-    broadcast_position_update("blue")
+    broadcast_position_update("red")
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "player_swap"

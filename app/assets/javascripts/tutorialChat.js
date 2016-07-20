@@ -1,5 +1,6 @@
-var TutorialChat = function() {
+var TutorialChat = function($el) {
   this.initialize = function() {
+    this.$el = $el;
     this.attachHandlers();
     EventsListener.send('tutorial.chat.ready');
   };
@@ -25,13 +26,13 @@ var TutorialChat = function() {
   };
 
   this.displayTutorialMessage = function(messageNode) {
-    $(".tutorial-messages").append(messageNode)
-    $(".tutorial-messages").animate({scrollTop: $('.tutorial-messages').prop("scrollHeight")}, 500)
+    this.$el.append(messageNode)
+    this.$el.animate({scrollTop: this.$el.prop("scrollHeight")}, 500)
   };
 };
 
 $(document).on('turbolinks:load', function () {
   if ($('.tutorial-messages').length) {
-    new TutorialChat().initialize();
+    new TutorialChat($(".tutorial-messages")).initialize();
   }
 })
