@@ -1,16 +1,33 @@
-var setPlayerName = function(new_player) {
-  var $el = $('.player-name.waiting');
-  if (!$el.length) {
-    return;
-  }
+var PlayerName = function(){
+  this.initialize = function() {
+    this.attachHandlers();
+  };
 
-  $el.removeClass("waiting")
-  $el.text("");
+  this.attachHandlers = function() {
+    EventsListener.listen('player.changed', this.setPlayerName.bind(this))
+  };
 
-  $el.addClass(new_player.color)
-  $el.text(new_player.user_name + " (" + getNoun(new_player) + ")");
+  this.setPlayerName = function(data) {
+    var $el = $('.player-name.waiting');
+    if (!$el.length) {
+      return;
+    }
+
+    var player = data.player;
+
+    $el.removeClass("waiting")
+    $el.addClass(player.color).text(player.user_name + " (" + this.getNoun(player) + ")");
+  };
+
+  this.getNoun = function(player) {
+    if(!current_player) {
+      return "Them";
+    } 
+
+    return current_player.user_id === player.user_id ? "You" : "Them";
+  };
 };
 
-var getNoun = function(player) {
-  return (current_player && current_player.user_id === player.user_id) ? "You" : "Them";
-};
+$(document).on('turbolinks:load', function() {
+  new PlayerName().initialize();
+})

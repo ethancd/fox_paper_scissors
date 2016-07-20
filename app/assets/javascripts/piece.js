@@ -30,7 +30,7 @@ var Piece = function(color, type, position){
     EventsListener.listen("position.updated", this.checkThreatened.bind(this));
 
     this.$el.on('click', function() {
-      if (current_player && (current_player.first ? this.color === "red" : this.color === "blue")) {
+      if (current_player && current_player.color === this.color) {
         this.highlight()
       }
     }.bind(this));
@@ -157,7 +157,7 @@ var Piece = function(color, type, position){
   };
 
   this.getEnemy = function () {
-    var enemyColor = this.color === "red" ? "blue" : "red";
+    var enemyColor = Helpers.swapColor(this.color);
     var enemyType = this.enemyMap[this.type];
 
     return Pieces.find(function(piece) {
@@ -167,7 +167,7 @@ var Piece = function(color, type, position){
 };
 
 var getThreatenedPieces = function (activeColor) {
-  return $.grep(Pieces, function(piece) {
+  return _.filter(Pieces, function(piece) {
     return piece.color === activeColor && piece.isThreatened();
   });
 };

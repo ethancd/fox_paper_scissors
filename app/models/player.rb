@@ -28,4 +28,11 @@ class Player < ApplicationRecord
   def color
     self.first ? "red" : "blue"
   end
+
+  def as_json(options = {})
+      result = super(options)
+      result[:color] = color
+      result[:user_name] = user_name
+      result
+  end
 end

@@ -11,8 +11,8 @@ var GameButton = function(){
 
   this.attachHandlers = function() {
     $("button.game.new-game").on('click', this.createNewGame.bind(this));
-    $("button.game.offer-draw").on('click', this.offerDraw);
-    $("button.game.accept-draw").on('click', this.acceptDraw);
+    $("button.game.offer-draw").on('click', this.offerDraw.bind(this));
+    $("button.game.accept-draw").on('click', this.acceptDraw.bind(this));
     EventsListener.listen('button.modified', this.modifyButton.bind(this))
     EventsListener.listen('enable.button', this.setActiveButton.bind(this))
   };

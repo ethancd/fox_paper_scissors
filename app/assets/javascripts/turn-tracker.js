@@ -8,13 +8,10 @@ var TurnTracker = function (){
   };
   
   this.toggleTurnMarker = function(data) {
-    this.turnMarkerEl.removeClass(data.color);
+    var newColor = Helpers.swapColor(data.color);
 
-    if (data.color === "red") {
-      this.turnMarkerEl.addClass("blue");
-    } else if (data.color === "blue") {
-      this.turnMarkerEl.addClass("red");
-    }
+    this.turnMarkerEl.removeClass(data.color);
+    this.turnMarkerEl.addClass(newColor);
   };
 
   this.resetTurnMarker = function(data) {
@@ -25,5 +22,5 @@ var TurnTracker = function (){
 
 
 $(document).on('turbolinks:load', function() {
-  var turnTracker = new TurnTracker().initialize();
+  new TurnTracker().initialize();
 })

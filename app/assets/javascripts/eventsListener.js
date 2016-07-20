@@ -7,7 +7,7 @@ var EventsListener = {
 
     _.each(this.registeredCallbacks[messageName], function(callback) {
       callback.call(this, data);
-    }, this);
+    }.bind(this));
   },
   listen: function(messageName, callback) {
     if (this.registeredCallbacks[messageName] === undefined) {

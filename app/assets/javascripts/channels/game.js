@@ -98,8 +98,8 @@ var playerJoinedGame = function(data) {
 };
 
 var swapPlayers = function() {
-  current_player.color = (current_player.color == "red" ? "blue" : "red")
-  current_player.first = !current_player.first
+  current_player.color = Helpers.swapColor(current_player.color);
+  current_player.first = !current_player.first;
 
   var redName = $(".player-name.red").text();
   var redWins = $(".player-name.red").attr("data-content")
