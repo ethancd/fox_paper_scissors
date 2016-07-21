@@ -9,7 +9,7 @@ var Tutorial = function(){
   this.moveCounter = 0;
 
   this.runTutorial = function() {
-    EventsListener.send('tutorial.message', { text: this.getGameTitle(), tickMs: 0 });
+    EventsListener.send('tutorial.message', { innerHtml: this.getGameTitle(), tickMs: 0 });
     setTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
   };
 
@@ -42,7 +42,7 @@ var Tutorial = function(){
   };
 
   this.startNewGame = function() {
-    EventsListener.send('tutorial.message', { text: this.getGameTitle(), tickMs: this.tickMs * 2 });
+    EventsListener.send('tutorial.message', { innerHtml: this.getGameTitle(), tickMs: this.tickMs * 2 });
 
     setTimeout(function() {
       EventsListener.send('position.updated', { position: this.startingPosition });
@@ -53,7 +53,7 @@ var Tutorial = function(){
 
   this.executeTutorialStep = function(move, message) {
     EventsListener.send('piece.launched', { delta: move, tickMs: this.tickMs / 3 })
-    EventsListener.send('tutorial.message', { text: message, tickMs: this.tickMs / 3 });
+    EventsListener.send('tutorial.message', { innerHtml: message, tickMs: this.tickMs / 3 });
   };
 
   this.getGameTitle = function() {
