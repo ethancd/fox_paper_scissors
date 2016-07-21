@@ -1,10 +1,18 @@
-module AI
+class AI < Player
   include GameGrammar
+
+  def self.id
+    @computer_player_user_id ||= "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
+  end
 
   attr_accessor :fuzzy
 
   AI_SEARCH_DEPTH = 6
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
+
+  def ai?
+    true
+  end
 
   def move(board_position, side, options = {})
     @fuzzy = options[:fuzzy]
@@ -48,6 +56,8 @@ module AI
 
     reply
   end
+
+  private
 
   def replies
     {

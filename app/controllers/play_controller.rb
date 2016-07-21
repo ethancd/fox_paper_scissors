@@ -1,6 +1,7 @@
 class PlayController < ApplicationController
   before_filter :ensure_slug, only: [:ai, :human]
-
+  before_filter :find_game, only: [:accept_draw, :offer_draw, :create, :move]
+  
   def ai
     @game = Game.find_or_create_by(slug: params[:slug])
 
@@ -9,7 +10,7 @@ class PlayController < ApplicationController
     end
 
     if @game.new?
-      @game = build_game(@user.id, Player::COMPUTER_PLAYER_USER_ID)
+      @game.build_ai(@user.id)
     end
 
     if @game.is_ai_turn?
@@ -26,21 +27,12 @@ class PlayController < ApplicationController
       return redirect_to action: "ai", slug: params[:slug]
     end
 
-    if @game.players.length == 0 
-      @game.players.create({user_id: @user.id, first: true})
-      @game.create_chat
-      @game.save
-    elsif @game.players.length == 1 && @game.players[0].user_id != @user.id
-      @game.players.create({user_id: @user.id, first: false})
-      @game.create_board
-      @game.save
-    end
+    @game.incorporate_player(@user)
 
     render "index"
   end
 
   def move
-    @game = Game.find_by({slug: params[:slug] })
     player = @game.players.find_by(user_id: @user.id)
 
     @move = @game.moves.new(player_id: player.id)
@@ -56,30 +48,14 @@ class PlayController < ApplicationController
   end
 
   def create
-    @game = Game.find_by({slug: params[:slug] })
-    @game.moves.delete_all
-    @game.board.reset_board
-    @game.swap_player_order
-    @game.players.each do |player|
-      player.draws_considered = []
-      player.save
-    end
+    render(status: 405) and return unless @game.complete?
 
-    @game.board.save
-    @game.save
+    new_game = @game.next    
 
-    @game.broadcast_new_game
-
-    ai = find_ai
-    if ai && ai.first
-      FindMove.perform_later(@game)
-      #ai_move
-    end
+    @game.broadcast_new_game(new_game.slug)
   end
 
   def offer_draw
-    @game = Game.find_by({slug: params[:slug] })
-
     ActionCable.server.broadcast "game_#{params[:slug]}", {
       action: "draw_offered",
       offerer_name: @user.name,
@@ -92,21 +68,27 @@ class PlayController < ApplicationController
   end
 
   def accept_draw
+    @game.draw!
     broadcast_accept_draw
   end
 
   private
-    def ai_move
-      ai = find_ai
-      delta = ai.move(@game.board.position, ai.color, {fuzzy: true})
 
-      if !delta.nil?
-        @game.moves.create!({delta: delta, player_id: ai.id })
-      end
+    def find_game
+      @game = Game.find_by({slug: params[:slug] })
     end
 
+    # def ai_move
+    #   ai = @game.ai_player
+    #   delta = ai.move(@game.board.position, ai.color, {fuzzy: true})
+
+    #   if !delta.nil?
+    #     @game.moves.create!({delta: delta, player_id: ai.id })
+    #   end
+    # end
+
     def ai_respond_to_draw_offer
-      ai = find_ai
+      ai = @game.ai_player
       reply = ai.reply_to_draw_offer(@game)
 
       ActionCable.server.broadcast "game_#{params[:slug]}", {
@@ -119,25 +101,10 @@ class PlayController < ApplicationController
       end
     end
 
-    def find_ai
-      @game.players.find { |player| player.ai? }
-    end
-
     def ensure_slug
-      unless valid_slug(params[:slug])
-        redirect_to action: action_name, slug: generate_new_slug
+      unless Game.valid_slug?(params[:slug])
+        redirect_to action: action_name, slug: Game.generate_slug
       end
-    end
-
-    def valid_slug(slug)
-      !!/^[0-9|a-f]{8}$/.match(slug)
-    end
-
-    def generate_new_slug
-      loop do
-        slug = SecureRandom.hex(4)
-        return slug if Game.find_by(slug: slug) == nil
-      end 
     end
 
     def broadcast_accept_draw
@@ -146,14 +113,4 @@ class PlayController < ApplicationController
       }
     end
 
-    def build_game(user_id1, user_id2)
-      @game.players.new([{user_id: user_id1, first: true}, {user_id: user_id2, first: false}])
-      @game.shuffle_player_order
-
-      @game.create_chat
-      @game.create_board
-      @game.save
-
-      @game
-    end
 end

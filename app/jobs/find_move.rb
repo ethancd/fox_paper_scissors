@@ -2,10 +2,10 @@ class FindMove < ActiveJob::Base
   queue_as :ai
 
   def perform(game)
-    ai = game.players.find { |player| player.ai? }
+    ai = game.ai_player
     delta = ai.move(game.board.position, ai.color, {fuzzy: true})
 
-    if !delta.nil?
+    unless delta.nil?
       game.moves.create!({delta: delta, player_id: ai.id })
     end
   end
