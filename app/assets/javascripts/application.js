@@ -15,4 +15,7 @@
 //= require turbolinks
 //= require js-cookie.js
 //= require lodash
+//= require react
+//= require react_ujs
+//= require components
 //= require_tree .

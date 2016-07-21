@@ -36,7 +36,8 @@ Rails.application.configure do
 
   config.web_socket_server_url = "wss://fox-paper-scissors.herokuapp.com/cable" 
   config.action_cable.allowed_request_origins = ['https://fox-paper-scissors.herokuapp.com', 'http://fox-paper-scissors.herokuapp.com']
-
+  
+  config.react.variant = :production
 
   # Mount Action Cable outside main process or domain
   # config.action_cable.mount_path = nil
