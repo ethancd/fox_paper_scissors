@@ -1,6 +1,3 @@
-//temporary i hope hope hope
-//leaving it for react to deal with! hahaha
-
 var Piece = function(options, $el, board){
   this.initialize = function() {
     this.$el = $el;
@@ -31,7 +28,7 @@ var Piece = function(options, $el, board){
     EventsListener.listen("piece.launched", this.launchPiece.bind(this));
 
     this.$el.on('click', function() {
-      if (current_player && current_player.color === this.color) {
+      if (CurrentPlayer && CurrentPlayer.color === this.color) {
         this.highlight()
       }
     }.bind(this));
@@ -122,16 +119,10 @@ var Piece = function(options, $el, board){
     this.position = target;
     this.moveToPosition();
     EventsListener.send("piece.moved", {color: this.color});
+    EventsListener.send("check.threatened");
 
     this.$el.removeClass("highlighted")
   };
-
-  this.unMovePiece = function () {
-    this.position = this.priorPosition;
-    this.moveToPosition();
-
-    EventsListener.send("piece.unmoved", {color: this.color})
-  }
 
   this.moveToPosition = function() {
     var $target = $('.node').filter(function(i, el) {
@@ -141,30 +132,19 @@ var Piece = function(options, $el, board){
 
     this.$el.detach();
     $target.append(this.$el);
-
-    EventsListener.send("check.threatened");
   };
 
   this.resetPiece = function() {
+    //probably throws a bug on pages where player reloads in the middle of the game
+    //original position will be some wacky midgame thing, not startingposition
     this.position = this.originalPosition;
     this.moveToPosition();
   };
 
   this.matchesTurnColor = function(piece, tracker) {
-    var colors = ["red", "blue"];
-    for (var i = 0; i < colors.length; i++) {
-      if (piece.hasClass(color) && tracker.hasClass(color)) {
-        return true;
-      }
-    }
-  };
-
-  this.serialize = function() {
-    return {
-      position: this.position,
-      type: this.type,
-      color: this.color
-    };
+    return _.some(["red", "blue"], function(color) {
+      return piece.hasClass(color) && tracker.hasClass(color);
+    });
   };
 
   this.isMobile = function () {
@@ -193,7 +173,7 @@ var Piece = function(options, $el, board){
     var enemyColor = Helpers.swapColor(this.color);
     var enemyType = this.enemyMap[this.type];
 
-    return Pieces.find(function(piece) {
+    return this.board.pieces.find(function(piece) {
       return piece.color == enemyColor && piece.type == enemyType;
     });
   };
@@ -206,7 +186,3 @@ var Piece = function(options, $el, board){
     this.$el.prop("disabled", false);
   };
 };
-
-$(document).on('turbolinks:load', function () {
-  initializePieces();
-})

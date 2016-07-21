@@ -4,7 +4,6 @@ var PlayerNames = function(){
   };
 
   this.attachHandlers = function() {
-    EventsListener.listen('player.changed', this.setPlayerName.bind(this))
     EventsListener.listen('game.won', this.addStar.bind(this))
     EventsListener.listen("player.joined", this.playerJoinedGame.bind(this));
     EventsListener.listen("players.swapped", this.swapPlayers.bind(this));
@@ -19,28 +18,26 @@ var PlayerNames = function(){
     $winnerNameEl.attr('data-content', currentScore + "*");
   }
 
-  this.setPlayerName = function(data) {
+  this.setPlayerName = function(player) {
     var $el = $('.player-name.waiting');
     if (!$el.length) {
       return;
     }
-
-    var player = data.player;
 
     $el.removeClass("waiting")
     $el.addClass(player.color).text(player.user_name + " (" + this.getNoun(player) + ")");
   };
 
   this.getNoun = function(player) {
-    if(!current_player) {
+    if(!CurrentPlayer) {
       return "Them";
     } 
 
-    return current_player.user_id === player.user_id ? "You" : "Them";
+    return CurrentPlayer.user_id === player.user_id ? "You" : "Them";
   };
 
   this.samePlayer = function(newPlayer) {
-    return current_player && current_player.user_id === newPlayer.user_id;
+    return CurrentPlayer && CurrentPlayer.user_id === newPlayer.user_id;
   };
 
   this.tellUserToShare = function() {
@@ -70,8 +67,8 @@ var PlayerNames = function(){
   };
 
   this.swapPlayers = function() {
-    current_player.color = Helpers.swapColor(current_player.color);
-    current_player.first = !current_player.first;
+    CurrentPlayer.color = Helpers.swapColor(CurrentPlayer.color);
+    CurrentPlayer.first = !CurrentPlayer.first;
 
     var redName = $(".player-name.red").text();
     var redWins = $(".player-name.red").attr("data-content")

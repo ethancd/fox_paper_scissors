@@ -1,7 +1,7 @@
 <div class="chat" id="<%= chat.id %>">
   <ul class="messages">
     <% chat.messages.each do |message| %>
-      <li class="message"><%= message %></li>
+      <li class="message"><%= "#{message.author.name}: #{message.text}" %></li>
     <% end %>
   </ul>
   <textarea></textarea>

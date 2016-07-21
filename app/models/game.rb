@@ -46,7 +46,7 @@ class Game < ApplicationRecord
   end
 
   def broadcast_new_game
-    broadcast_position_update("red")
+    broadcast_position_update("blue")
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "player_swap"

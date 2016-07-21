@@ -2,7 +2,10 @@ var Board = function($el){
   this.initialize = function() {
     this.$el = $el;
     this.attachHandlers();
-    this.initializePieces({position: StartingPosition});
+
+    if(StartingPosition) {
+      this.initializePieces({position: StartingPosition});
+    }
   };
 
   this.pieceColors = [ "red", "blue"];
@@ -13,7 +16,7 @@ var Board = function($el){
 
     EventsListener.listen("piece.clicked", this.highlightLegalNodes.bind(this));
     EventsListener.listen("game.over", this.disablePieces.bind(this));
-    EventsListener.listen("position.updated", this.setPieces.bind(this));
+    EventsListener.listen("position.updated", this.setPiecesToPosition.bind(this));
     EventsListener.listen("board.initialized", this.initializePieces.bind(this));
   };
 
@@ -29,7 +32,7 @@ var Board = function($el){
           position: Helpers.getCoordinatesFromLetter(data.position[i])
         };
 
-        var $piece = this.findOrCreatePiece('.piece.' + color + '.' + type, options.position);
+        var $piece = this.findOrCreatePiece(options);
         var piece = new Piece(options, $piece, this).initialize();
 
         this.pieces.push(piece);
@@ -56,11 +59,15 @@ var Board = function($el){
   };
 
   this.disablePieces = function() {
-    _.each(this.pieces, disable);
+    _.each(this.pieces, function(piece) {
+      piece.disable();
+    });
   };
 
   this.enablePieces = function() {
-    _.each(this.pieces, enable);
+    _.each(this.pieces, function(piece) {
+      piece.enable();
+    });
   };
 
   this.setPiecesToPosition = function(data) {
@@ -72,12 +79,12 @@ var Board = function($el){
     });
   };
 
-  this.findOrCreatePiece = function(description, position) {
-    var $piece = this.$el.find(description);
+  this.findOrCreatePiece = function(data) {
+    var $piece = this.$el.find(".piece." + data.color + "." + data.type);
 
     if (!$piece.length) {
-      $piece = $("<div>", {"class": description});
-      this.appendPieceToTarget($piece, position);
+      $piece = $("<div>", {"class": "piece " + data.color + " " + data.type});
+      this.appendPieceToTarget($piece, data.position);
     }
 
     return $piece;
@@ -86,7 +93,7 @@ var Board = function($el){
   this.appendPieceToTarget = function($piece, position) {
     var $target = $('.node').filter(function(i, el) {
       var coords = Helpers.getPositionFromNode($(el));
-      return _.isEqual(pieceData.position, coords);
+      return _.isEqual(position, coords);
     }.bind(this))
 
     $target.append($piece);

@@ -19,21 +19,21 @@ var Helpers = {
   getCoordinatesFromLetter: function(letter) {
     var base = "a".charCodeAt(0);
     var index = letter.charCodeAt(0) - base;
-    var coordinateList = getCoordinateList();
+    var coordinatesList = this.getCoordinatesList();
 
-    return coordinateList[index];
+    return coordinatesList[index];
   },
-  getCoordinateList: function() {
-    var coordinateList = [];
+  getCoordinatesList: function() {
+    var coordinatesList = [];
 
     _.times(7, function(i) {
       _.times(7, function(j) {
         if (i%2 === j%2) {
-          coordinateList.push([j,i]);
+          coordinatesList.push([j,i]);
         }
       })
     });
 
-    return coordinateList;
+    return coordinatesList;
   }
 };

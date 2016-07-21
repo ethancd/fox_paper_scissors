@@ -2,7 +2,6 @@ var TutorialChat = function($el) {
   this.initialize = function() {
     this.$el = $el;
     this.attachHandlers();
-    EventsListener.send('tutorial.chat.ready');
   };
   
   this.attachHandlers = function() {

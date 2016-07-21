@@ -21,7 +21,7 @@ var gameSubscribe = function (slug) {
     },
     draw_offered: function (data) {
       EventsListener.send('chat.message', { text: data.offerer_name + " offers a draw." });
-      if(data.offerer_id !== current_player.user_id) {
+      if(data.offerer_id !== CurrentPlayer.user_id) {
         EventsListener.send('enable.button', {buttonClass: "accept-draw"});
       }
     },

@@ -1,6 +1,6 @@
 var Tutorial = function(){
   this.initialize = function() {
-    EventsListener.listen('tutorial.chat.ready', this.runTutorial.bind(this));
+    this.runTutorial();
   };
 
   this.startingPosition = "ahbyxr"

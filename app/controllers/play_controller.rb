@@ -71,7 +71,7 @@ class PlayController < ApplicationController
     @game.broadcast_new_game
 
     ai = find_ai
-    if ai.first
+    if ai && ai.first
       FindMove.perform_later(@game)
       #ai_move
     end
