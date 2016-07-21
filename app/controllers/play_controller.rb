@@ -1,6 +1,6 @@
 class PlayController < ApplicationController
   before_filter :ensure_slug, only: [:ai, :human]
-  before_filter :find_game, only: [:accept_draw, :offer_draw, :create, :move]
+  before_filter :find_game, only: [:move, :create, :offer_draw, :accept_draw]
   
   def ai
     @game = Game.find_or_create_by(slug: params[:slug])
@@ -10,7 +10,7 @@ class PlayController < ApplicationController
     end
 
     if @game.new?
-      @game.build_ai(@user.id)
+      @game.build_vs_ai(@user.id, params[:depth])
     end
 
     if @game.is_ai_turn?
@@ -41,7 +41,6 @@ class PlayController < ApplicationController
 
     if @game.with_ai?
       FindMove.perform_later(@game)
-      #ai_move
     end
 
     render :json => { success: true } #@move.valid? }
@@ -50,7 +49,11 @@ class PlayController < ApplicationController
   def create
     render(status: 405) and return unless @game.complete?
 
-    new_game = @game.next    
+    new_game = @game.build_next_game
+
+    if new_game.is_ai_turn?
+      FindMove.perform_later(new_game)
+    end
 
     @game.broadcast_new_game(new_game.slug)
   end
@@ -68,24 +71,19 @@ class PlayController < ApplicationController
   end
 
   def accept_draw
-    @game.draw!
     broadcast_accept_draw
   end
 
   private
-
     def find_game
       @game = Game.find_by({slug: params[:slug] })
     end
 
-    # def ai_move
-    #   ai = @game.ai_player
-    #   delta = ai.move(@game.board.position, ai.color, {fuzzy: true})
-
-    #   if !delta.nil?
-    #     @game.moves.create!({delta: delta, player_id: ai.id })
-    #   end
-    # end
+    def ensure_slug
+      unless Game.valid_slug?(params[:slug])
+        redirect_to action: action_name, slug: Game.generate_slug
+      end
+    end
 
     def ai_respond_to_draw_offer
       ai = @game.ai_player
@@ -101,16 +99,9 @@ class PlayController < ApplicationController
       end
     end
 
-    def ensure_slug
-      unless Game.valid_slug?(params[:slug])
-        redirect_to action: action_name, slug: Game.generate_slug
-      end
-    end
-
     def broadcast_accept_draw
       ActionCable.server.broadcast "game_#{params[:slug]}", {
         action: "draw_accepted"
       }
     end
-
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160718203853) do
+ActiveRecord::Schema.define(version: 20160721231608) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 20160718203853) do
     t.uuid     "user_id"
     t.integer  "game_id"
     t.integer  "draws_considered", default: [],              array: true
+    t.integer  "search_depth"
     t.index ["game_id"], name: "index_players_on_game_id", using: :btree
   end
 

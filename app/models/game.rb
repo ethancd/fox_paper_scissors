@@ -7,61 +7,58 @@ class Game < ApplicationRecord
 
   delegate :position, to: :board, prefix: true, allow_nil: true
 
-  def build_ai(user_id)
-    build(*[user_id, AI.id].shuffle)
+  def build_vs_ai(user_id, search_depth)
+    player = Player.create({user_id: user_id})
+    ai = AI.create({user_id: AI.id, search_depth: search_depth})
+
+    build(*[player, ai].shuffle)
   end
 
-  def build(user_id1, user_id2)
-    players.new([{user_id: user_id1, first: true}, {user_id: user_id2, first: false}])
+  def build(player1, player2)
+    player1.first = true
+    player2.first = false
     
     create_chat
     create_board
 
-    if ai_player.try(:first)
-      FindMove.perform_later(self)
-    end
-
     save
-
     self
   end
 
-def first_player
-  self.players.find {|p| p.first }
-end
-
-def second_player
-  self.players.find {|p| !p.first }
-end
-
-def next
-  build(second_player.user_id, first_player.user_id)  
-end
-
-def incorporate_player(user)
-  if players.length == 0 
-    players.create({user_id: user.id, first: true})
-    create_chat
-  elsif players.length == 1 && players.first.user_id != user.id
-    players.create({user_id: user.id, first: false})
-    create_board
-  #elsif players.length >= 2
-    #track spectators
+  def first_player
+    players.find {|p| p.first }
   end
 
-  save
-end
+  def second_player
+    players.find {|p| !p.first }
+  end
 
-def self.valid_slug?(slug)
-  !!/^[0-9|a-f]{8}$/.match(slug)
-end
+  def build_next_game
+    build(second_player, first_player)  
+  end
 
-def self.generate_slug
-  loop do
-    slug = SecureRandom.hex(4)
-    return slug if find_by(slug: slug) == nil
-  end 
-end
+  def incorporate_player(user)
+    if players.length == 0 
+      players.create({user_id: user.id, first: true})
+      create_chat
+    elsif players.length == 1 && players.first.user_id != user.id
+      players.create({user_id: user.id, first: false})
+      create_board
+    end
+
+    save
+  end
+
+  def self.valid_slug?(slug)
+    !!/^[0-9|a-f]{8}$/.match(slug)
+  end
+
+  def self.generate_slug
+    loop do
+      slug = SecureRandom.hex(4)
+      return slug if find_by(slug: slug) == nil
+    end 
+  end
 
   def shuffle_player_order
     players.first.first = [true, false].sample
@@ -107,18 +104,6 @@ end
     }
   end
 
-  def result
-    @result ||= board.checkmate?
-  end
-
-  def result=(value)
-    @result = value
-  end
-
-  def draw!
-    result = :draw
-  end
-
   def ai_player
       @ai_player ||= players.find { |player| player.ai? }
   end
@@ -142,7 +127,7 @@ end
   end
 
   def between_humans?
-    !self.players.nil? && self.players.length == 2 && self.players.all? { |player| !player.ai? }
+    !self.players.nil? && self.players.length == 2 && ai_player.nil?
   end
 
   def with_ai?

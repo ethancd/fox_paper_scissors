@@ -38,8 +38,6 @@ class GameNode
     !simple_score.between?(MIN_SCORE, MAX_SCORE) 
   end
 
-  # This method generates an array of all moves that can be made after
-  # the current move.
   def children
     children = []
 
@@ -53,12 +51,12 @@ class GameNode
   end
 
   def losing?(side)
-    @score = simple_score(side) if @score.nil?
+    @score ||= simple_score(side)
     @score <= MIN_SCORE
   end
 
   def winning?(side)
-    @score = simple_score(side) if @score.nil?
+    @score ||= simple_score(side)
     @score >= MAX_SCORE
   end
 end
