@@ -71,7 +71,6 @@ class AI < Player
 
   private
     def ensure_search_depth
-      byebug
       if self.search_depth.nil?
         self.search_depth = DEFAULT_SEARCH_DEPTH
       end
