@@ -3,7 +3,10 @@ class AI < Player
 
   attr_accessor :fuzzy, :search_depth
 
-  DEFAULT_SEARCH_DEPTH = 6
+  before_save :ensure_search_depth
+  #after_update :broadcast_player_name_update
+
+  DEFAULT_SEARCH_DEPTH = 1
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
   COMPUTER_PLAYER_USER_ID = "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
 
@@ -15,9 +18,24 @@ class AI < Player
     true
   end
 
-  def search_depth
-    self[:search_depth] || DEFAULT_SEARCH_DEPTH
+  def ensure_search_depth
+    puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    puts "THIS IS GETTING CALLED"
+    puts self.inspect
+
+    if self.search_depth.nil?
+          puts "DUH IT WAS NIL"
+      self.update({search_depth: DEFAULT_SEARCH_DEPTH})
+      save
+    end
+
+    puts "THIS GOT CALLED"
+    puts self.inspect
   end
+
+  # def broadcast_player_name_update
+      #NYI
+  # end
 
   def move(board_position, side, options = {})
     @fuzzy = options[:fuzzy]

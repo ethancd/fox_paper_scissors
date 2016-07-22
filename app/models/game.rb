@@ -8,16 +8,18 @@ class Game < ApplicationRecord
   delegate :position, to: :board, prefix: true, allow_nil: true
 
   def build_vs_ai(user_id, search_depth)
-    player = Player.create({user_id: user_id})
-    ai = AI.create({user_id: AI.id, search_depth: search_depth})
+    human = Player.new({user_id: user_id})
+    ai = AI.new({user_id: AI.id, search_depth: search_depth})
 
-    build(*[player, ai].shuffle)
+    build(*[human, ai].shuffle)
   end
 
   def build(player1, player2)
     player1.first = true
     player2.first = false
-    
+
+    players << player1
+    players << player2
     create_chat
     create_board
 

@@ -1,7 +1,4 @@
-<% first_player = @game.players.find_by({first: true}) %>
-<% second_player = @game.players.find_by({first: false}) %>
-
-<%= render partial: "shared/player_name", locals: { player: first_player, user: @user } %>
+<%= render partial: "shared/player_name", locals: { player: @game.first_player, user: @user } %>
 
 <div class="play-area">
   <%= render partial: "shared/turn_tracker", locals: { player: @game.current_player } %>
@@ -9,7 +6,7 @@
   <%= render partial: "shared/chat", locals: { chat: @game.chat } %>
 </div>
 
-<%= render partial: "shared/player_name", locals:  { player: second_player, user: @user } %>
+<%= render partial: "shared/player_name", locals:  { player: @game.second_player, user: @user } %>
 
 
 <div class="play-image"></div>

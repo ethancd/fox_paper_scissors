@@ -11,6 +11,8 @@ class PlayController < ApplicationController
 
     if @game.new?
       @game.build_vs_ai(@user.id, params[:depth])
+    elsif params[:depth].present?
+      @game.ai_player.update({search_depth: params[:depth]})
     end
 
     if @game.is_ai_turn?
@@ -24,7 +26,7 @@ class PlayController < ApplicationController
     @game = Game.find_or_create_by(slug: params[:slug])
 
     if @game.with_ai?
-      return redirect_to action: "ai", slug: params[:slug]
+      return redirect_to action: "ai", slug: params[:slug], depth: params[:depth]
     end
 
     @game.incorporate_player(@user)
@@ -81,7 +83,7 @@ class PlayController < ApplicationController
 
     def ensure_slug
       unless Game.valid_slug?(params[:slug])
-        redirect_to action: action_name, slug: Game.generate_slug
+        redirect_to action: action_name, slug: Game.generate_slug, depth: params[:depth]
       end
     end
 
