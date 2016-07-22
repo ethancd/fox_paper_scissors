@@ -49,15 +49,13 @@ class PlayController < ApplicationController
   end
 
   def create
-    render(status: 405) and return unless @game.complete?
+    @game.build_next_game
 
-    new_game = @game.build_next_game
-
-    if new_game.is_ai_turn?
-      FindMove.perform_later(new_game)
+    if @game.is_ai_turn?
+      FindMove.perform_later(@game)
     end
 
-    @game.broadcast_new_game(new_game.slug)
+    @game.broadcast_new_game
   end
 
   def offer_draw

@@ -1,5 +1,5 @@
 class Player < ApplicationRecord
-  belongs_to :game
+  belongs_to :game, autosave: true
   belongs_to :user
 
   validates_presence_of :user
@@ -15,7 +15,7 @@ class Player < ApplicationRecord
 
   def user_name
     if ai?
-      user.name + "_" + search_depth.to_s
+      user.name + "_" + AI::DEFAULT_SEARCH_DEPTH.to_s #search_depth.to_s
     else
       user.name
     end

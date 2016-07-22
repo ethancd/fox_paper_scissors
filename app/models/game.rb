@@ -7,9 +7,11 @@ class Game < ApplicationRecord
 
   delegate :position, to: :board, prefix: true, allow_nil: true
 
+  COLORS = [:red, :blue]
+
   def build_vs_ai(user_id, search_depth)
     human = Player.new({user_id: user_id})
-    ai = AI.new({user_id: AI.id, search_depth: search_depth})
+    ai = AI.new({user_id: AI.id, search_depth: search_depth.try(:to_i)})
 
     build(*[human, ai].shuffle)
   end
@@ -36,7 +38,17 @@ class Game < ApplicationRecord
   end
 
   def build_next_game
-    build(second_player, first_player)  
+    wipe_game_history
+    swap_player_order
+
+    save
+    self
+  end
+
+  def wipe_game_history
+    moves.delete_all
+    board.reset_board
+    players.each { |p| p.draws_considered = [] }
   end
 
   def incorporate_player(user)
@@ -69,13 +81,13 @@ class Game < ApplicationRecord
   end
 
   def swap_player_order
-    players.each { |p| p.first = !p.first }
+    players.each { |p| p.first = !p.first; p.save }
 
     save
   end
 
   def broadcast_position_update(last_moved_color)
-    next_color = last_moved_color == "red" ? "blue" : "red"
+    next_color = other_color(last_moved_color)
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "position_update", 
@@ -89,7 +101,7 @@ class Game < ApplicationRecord
   end
 
   def broadcast_checkmate(next_color)
-    first_player_won = (next_color == "blue")
+    first_player_won = (next_color == COLORS.last)
     winner = Player.find_by({game_id: self.id, first: first_player_won })
 
     ActionCable.server.broadcast "game_#{self.slug}", {
@@ -99,11 +111,15 @@ class Game < ApplicationRecord
   end
 
   def broadcast_new_game
-    broadcast_position_update("blue")
+    broadcast_position_update(COLORS.last)
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "player_swap"
     }
+  end
+
+  def other_color(color)
+    COLORS.find { |c| c != color }
   end
 
   def ai_player
@@ -117,7 +133,7 @@ class Game < ApplicationRecord
   end
 
   def which_color_turn?
-    self.moves.length % 2 == 0 ? "red" : "blue"
+    COLORS[self.moves.length % 2]
   end
 
   def is_ai_turn?

@@ -9,14 +9,14 @@ class Message < ApplicationRecord
   def get_color
     player = Player.find_by(game_id: chat.game_id, user_id: self.author_id)
     if !player.nil? 
-      player.color == "red" ? colors[:red] : colors[:blue]
+      text_colors[player.color]
     else
-      return colors[:default]
+      return text_colors[:default]
     end
   end
 
     private
-      def colors
+      def text_colors
         {
           red: "#85200c",
           blue: "#1c4586",

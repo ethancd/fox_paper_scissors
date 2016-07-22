@@ -180,18 +180,18 @@ module GameGrammar
 
   def other_initial(initial)
     case initial
-      when "red", "r"
+      when "red", "r", :red
         "b"
-      when "blue", "b"
+      when "blue", "b", :blue
         "r"
     end
   end
 
   def other_side(side)
     case side
-      when "red", "r"
+      when "red", "r", :red
         "blue"
-      when "blue", "b"
+      when "blue", "b", :blue
         "red"
     end
   end
@@ -221,6 +221,15 @@ module GameGrammar
     end
   end
 
+  def get_initial_from_side(side)
+    case side
+      when "red", :red
+        "r"
+      when "blue", :blue
+        "b"
+    end
+  end
+
   def adjacent_spaces(pos)
     spaces = []
 
@@ -246,6 +255,6 @@ module GameGrammar
   end
 
   def get_game_position(side, board_position) 
-    side[0] + board_position
+    get_initial_from_side(side) + board_position
   end
 end

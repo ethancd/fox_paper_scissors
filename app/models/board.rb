@@ -1,7 +1,7 @@
 class Board < ApplicationRecord
   include GameGrammar
 
-  belongs_to :game
+  belongs_to :game, autosave: true
 
   after_initialize :setup_board
 

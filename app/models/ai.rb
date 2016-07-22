@@ -6,7 +6,7 @@ class AI < Player
   before_save :ensure_search_depth
   #after_update :broadcast_player_name_update
 
-  DEFAULT_SEARCH_DEPTH = 1
+  DEFAULT_SEARCH_DEPTH = 4
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
   COMPUTER_PLAYER_USER_ID = "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
 
@@ -19,18 +19,9 @@ class AI < Player
   end
 
   def ensure_search_depth
-    puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    puts "THIS IS GETTING CALLED"
-    puts self.inspect
-
     if self.search_depth.nil?
-          puts "DUH IT WAS NIL"
-      self.update({search_depth: DEFAULT_SEARCH_DEPTH})
-      save
+      self.search_depth = DEFAULT_SEARCH_DEPTH
     end
-
-    puts "THIS GOT CALLED"
-    puts self.inspect
   end
 
   # def broadcast_player_name_update
@@ -42,7 +33,7 @@ class AI < Player
     @side = side
     node = GameNode.new(get_game_position(side, board_position))
 
-    get_minimax_move(node, search_depth, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+    get_minimax_move(node, DEFAULT_SEARCH_DEPTH, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
   end
 
   def reply_to_draw_offer(game) 
