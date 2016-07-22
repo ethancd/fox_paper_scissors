@@ -7,6 +7,7 @@ class AI < Player
   #after_update :broadcast_player_name_update
 
   DEFAULT_SEARCH_DEPTH = 4
+  DEFAULT_TIME_LIMIT = 3
   FUZZY_STANDARD_DEVIATION = GameNode::MAX_SCORE / 20.0
   COMPUTER_PLAYER_USER_ID = "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
 
@@ -31,7 +32,7 @@ class AI < Player
     @side = side
     node = GameNode.new(get_game_position(side, board_position))
 
-    get_minimax_move(node, search_depth, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+    get_iterative_deepening_move(node, DEFAULT_TIME_LIMIT, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
   end
 
   def reply_to_draw_offer(game) 
@@ -109,6 +110,26 @@ class AI < Player
       (GameNode::MAX_SCORE / 5) * self.draws_considered.length
     end
 
+    def get_iterative_deepening_move(node, time_limit, min_limit, max_limit)
+      depth = 1
+      best_node = node.children.first
+
+      begin
+        Timeout::timeout(time_limit) do
+          while depth <= search_depth do
+            best_node = get_minimax_score(node, depth, min_limit, max_limit)
+            depth += 1
+          end
+        end
+      ensure
+        if best_node.losing?(@side)
+          return survival_move(node) 
+        end
+
+        return best_node.initial_delta
+      end 
+    end
+
     def get_minimax_move(node, depth, min_limit, max_limit)
       best_node = get_minimax_score(node, depth, min_limit, max_limit)
 
@@ -124,7 +145,7 @@ class AI < Player
       return nil if children.length == 0
 
       surviving_node = children.max_by do |child|
-        best_node = get_minimax_score(child, AI_SEARCH_DEPTH - 1, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+        best_node = get_minimax_score(child, search_depth - 1, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
         best_node.causal_path.length
       end
 
