@@ -1,11 +1,11 @@
 class Player < ApplicationRecord
-  include AI
-  belongs_to :game
+  belongs_to :game, autosave: true
   belongs_to :user
 
   validates_presence_of :user
   
-  COMPUTER_PLAYER_USER_ID = "34e1d79e-22d8-4575-b617-e9cadca20e9e".freeze
+  FIRST_PLAYER_COLOR = :red
+  SECOND_PLAYER_COLOR = :blue
 
   def get_noun(user_id)
     return "AI" if ai?
@@ -15,24 +15,28 @@ class Player < ApplicationRecord
 
   def user_name
     if ai?
-      self.user.name + "_" + AI::AI_SEARCH_DEPTH.to_s
+      user.name + "_" + AI::DEFAULT_SEARCH_DEPTH.to_s #search_depth.to_s
     else
-      self.user.name
+      user.name
     end
   end
 
+  def user_id
+    user.id
+  end
+
   def ai?
-    self.user_id == COMPUTER_PLAYER_USER_ID
+    false
   end
 
   def color
-    self.first ? "red" : "blue"
+    self.first ? FIRST_PLAYER_COLOR : SECOND_PLAYER_COLOR
   end
 
   def as_json(options = {})
-      result = super(options)
-      result[:color] = color
-      result[:user_name] = user_name
-      result
+    result = super(options)
+    result[:color] = color
+    result[:user_name] = user_name
+    result
   end
 end

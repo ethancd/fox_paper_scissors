@@ -12,7 +12,7 @@ var chatSubscribe = function($el) {
       EventsListener.send('chat.message', { text: data.text + " has joined the room." });
     },
     new_message: function(data) {
-      EventsListener.send('chat.message', { text: data.text });
+      EventsListener.send('chat.message', { text: data.text, color: data.color });
     }
   });
 }

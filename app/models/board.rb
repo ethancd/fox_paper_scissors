@@ -1,36 +1,33 @@
 class Board < ApplicationRecord
   include GameGrammar
 
-  belongs_to :game
-
-  STARTING_POSITION = "ahbyxr".freeze
+  belongs_to :game, autosave: true
 
   after_initialize :setup_board
 
+  STARTING_POSITION = "ahbyxr".freeze
+  PIECE_COLORS = [:red, :blue]
+  PIECE_TYPES = [:rock, :paper, :scissors]
+
   def setup_board
-    self[:position] ||= STARTING_POSITION
-    @pieces = get_pieces(self[:position])
+    if position.nil?
+      update({position: STARTING_POSITION})
+    end
+
+    @pieces = get_pieces(position)
   end
 
   def reset_board
-    self[:position] = STARTING_POSITION
-    setup_board
-  end
-
-  def piece_colors
-    [:red, :blue]
-  end
-
-  def piece_types
-    [:rock, :paper, :scissors]
+    update({position: STARTING_POSITION})
+    @pieces = get_pieces(position)
   end
 
   def get_pieces(position)
     pieces = []
     index = 0
 
-    piece_colors.each do |color|
-      piece_types.each do |type|
+    PIECE_COLORS.each do |color|
+      PIECE_TYPES.each do |type|
         piece = Piece.new(color, type, get_spot(position[index]))
 
         pieces.push(piece)
@@ -42,11 +39,7 @@ class Board < ApplicationRecord
   end
 
   def pieces
-    @pieces ||= get_pieces(self[:position])
-  end
-
-  def position
-    self[:position]
+    @pieces ||= get_pieces(position)
   end
 
   def checkmate?(side)

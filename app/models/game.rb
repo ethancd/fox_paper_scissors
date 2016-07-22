@@ -5,24 +5,89 @@ class Game < ApplicationRecord
   has_one :board, dependent: :destroy
   has_one :chat, dependent: :destroy
 
-  def shuffle_player_order
-    players = self.players.shuffle
-    players[0][:first] = true
-    players[1][:first] = false
+  delegate :position, to: :board, prefix: true, allow_nil: true
 
-    self.players = players
-    self.save
+  COLORS = [:red, :blue]
+
+  def build_vs_ai(user_id, search_depth)
+    human = Player.new({user_id: user_id})
+    ai = AI.new({user_id: AI.id, search_depth: search_depth.try(:to_i)})
+
+    build(*[human, ai].shuffle)
+  end
+
+  def build(player1, player2)
+    player1.first = true
+    player2.first = false
+
+    players << player1
+    players << player2
+    create_chat
+    create_board
+
+    save
+    self
+  end
+
+  def first_player
+    players.find {|p| p.first }
+  end
+
+  def second_player
+    players.find {|p| !p.first }
+  end
+
+  def build_next_game
+    wipe_game_history
+    swap_player_order
+
+    save
+    self
+  end
+
+  def wipe_game_history
+    moves.delete_all
+    board.reset_board
+    players.each { |p| p.draws_considered = [] }
+  end
+
+  def incorporate_player(user)
+    if players.length == 0 
+      players.create({user_id: user.id, first: true})
+      create_chat
+    elsif players.length == 1 && players.first.user_id != user.id
+      players.create({user_id: user.id, first: false})
+      create_board
+    end
+
+    save
+  end
+
+  def self.valid_slug?(slug)
+    !!/^[0-9|a-f]{8}$/.match(slug)
+  end
+
+  def self.generate_slug
+    loop do
+      slug = SecureRandom.hex(4)
+      return slug if find_by(slug: slug) == nil
+    end 
+  end
+
+  def shuffle_player_order
+    players.first.first = [true, false].sample
+    players.second.first = !players.first.first
+    save
   end
 
   def swap_player_order
-    self.players.each do |player|
-      player.first = !player.first
-      player.save
-    end
+    players.each { |p| p.first = !p.first; p.save }
+
+    save
   end
 
   def broadcast_position_update(last_moved_color)
-    next_color = last_moved_color == "red" ? "blue" : "red"
+    next_color = other_color(last_moved_color)
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "position_update", 
@@ -36,7 +101,7 @@ class Game < ApplicationRecord
   end
 
   def broadcast_checkmate(next_color)
-    first_player_won = (next_color == "blue")
+    first_player_won = (next_color == COLORS.last)
     winner = Player.find_by({game_id: self.id, first: first_player_won })
 
     ActionCable.server.broadcast "game_#{self.slug}", {
@@ -46,11 +111,19 @@ class Game < ApplicationRecord
   end
 
   def broadcast_new_game
-    broadcast_position_update("blue")
+    broadcast_position_update(COLORS.last)
 
     ActionCable.server.broadcast "game_#{self.slug}", {
       action: "player_swap"
     }
+  end
+
+  def other_color(color)
+    COLORS.find { |c| c != color }
+  end
+
+  def ai_player
+      @ai_player ||= players.find { |player| player.ai? }
   end
 
   def current_player
@@ -60,7 +133,7 @@ class Game < ApplicationRecord
   end
 
   def which_color_turn?
-    self.moves.length % 2 == 0 ? "red" : "blue"
+    COLORS[self.moves.length % 2]
   end
 
   def is_ai_turn?
@@ -72,10 +145,14 @@ class Game < ApplicationRecord
   end
 
   def between_humans?
-    !self.players.nil? && self.players.length == 2 && self.players.all? { |player| !player.ai? }
+    !self.players.nil? && self.players.length == 2 && ai_player.nil?
   end
 
   def with_ai?
-    !self.players.nil? && self.players.any? { |player| player.ai? }
+    ai_player.present?
+  end
+
+  def complete?
+    !!result
   end
 end
