@@ -14,11 +14,7 @@ class Player < ApplicationRecord
   end
 
   def user_name
-    if ai?
-      user.name + "_" + AI::DEFAULT_SEARCH_DEPTH.to_s #search_depth.to_s
-    else
-      user.name
-    end
+    user.name
   end
 
   def user_id

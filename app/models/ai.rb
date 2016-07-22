@@ -3,7 +3,7 @@ class AI < Player
 
   attr_accessor :fuzzy, :search_depth
 
-  before_save :ensure_search_depth
+  after_initialize :ensure_search_depth
   #after_update :broadcast_player_name_update
 
   DEFAULT_SEARCH_DEPTH = 4
@@ -14,14 +14,12 @@ class AI < Player
     COMPUTER_PLAYER_USER_ID
   end
 
-  def ai?
-    true
+  def user_name
+    user.name + "_" + search_depth.to_s
   end
 
-  def ensure_search_depth
-    if self.search_depth.nil?
-      self.search_depth = DEFAULT_SEARCH_DEPTH
-    end
+  def ai?
+    true
   end
 
   # def broadcast_player_name_update
@@ -33,7 +31,7 @@ class AI < Player
     @side = side
     node = GameNode.new(get_game_position(side, board_position))
 
-    get_minimax_move(node, DEFAULT_SEARCH_DEPTH, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+    get_minimax_move(node, search_depth, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
   end
 
   def reply_to_draw_offer(game) 
@@ -72,6 +70,13 @@ class AI < Player
   end
 
   private
+    def ensure_search_depth
+      byebug
+      if self.search_depth.nil?
+        self.search_depth = DEFAULT_SEARCH_DEPTH
+      end
+    end
+
     def replies
       {
         too_early: "Draw Denial 501-NYI: not enough moves in game.",

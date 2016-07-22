@@ -11,7 +11,7 @@ class Game < ApplicationRecord
 
   def build_vs_ai(user_id, search_depth)
     human = Player.new({user_id: user_id})
-    ai = AI.new({user_id: AI.id, search_depth: search_depth.try(:to_i)})
+    ai = AI.new({user_id: AI.id, search_depth: search_depth})
 
     build(*[human, ai].shuffle)
   end
@@ -22,6 +22,9 @@ class Game < ApplicationRecord
 
     players << player1
     players << player2
+    player1.save
+    player2.save
+
     create_chat
     create_board
 

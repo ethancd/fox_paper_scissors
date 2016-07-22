@@ -13,6 +13,7 @@ class PlayController < ApplicationController
       @game.build_vs_ai(@user.id, params[:depth])
     elsif params[:depth].present?
       @game.ai_player.update({search_depth: params[:depth]})
+      @game.ai_player.save
     end
 
     if @game.is_ai_turn?
