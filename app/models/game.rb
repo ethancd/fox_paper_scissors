@@ -9,9 +9,9 @@ class Game < ApplicationRecord
 
   COLORS = [:red, :blue]
 
-  def build_vs_ai(user_id, search_depth)
+  def build_vs_ai(user_id)
     human = Player.new({user_id: user_id})
-    ai = AI.new({user_id: AI.id, search_depth: search_depth})
+    ai = AI.new({user_id: AI.id})
 
     build(*[human, ai].shuffle)
   end

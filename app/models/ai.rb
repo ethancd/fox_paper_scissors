@@ -1,10 +1,7 @@
 class AI < Player
   include GameGrammar
 
-  attr_accessor :fuzzy, :search_depth
-
-  after_initialize :ensure_search_depth
-  #after_update :broadcast_player_name_update
+  attr_accessor :fuzzy
 
   DEFAULT_SEARCH_DEPTH = 4
   DEFAULT_TIME_LIMIT = 3
@@ -16,16 +13,12 @@ class AI < Player
   end
 
   def user_name
-    user.name + "_" + search_depth.to_s
+    user.name + "_" + DEFAULT_SEARCH_DEPTH.to_s
   end
 
   def ai?
     true
   end
-
-  # def broadcast_player_name_update
-      #NYI
-  # end
 
   def move(board_position, side, options = {})
     @fuzzy = options[:fuzzy]
@@ -71,12 +64,6 @@ class AI < Player
   end
 
   private
-    def ensure_search_depth
-      if self.search_depth.nil?
-        self.search_depth = DEFAULT_SEARCH_DEPTH
-      end
-    end
-
     def replies
       {
         too_early: "Draw Denial 501-NYI: not enough moves in game.",
@@ -116,7 +103,7 @@ class AI < Player
 
       begin
         Timeout::timeout(time_limit) do
-          while depth <= search_depth do
+          while depth <= DEFAULT_SEARCH_DEPTH do
             best_node = get_minimax_score(node, depth, min_limit, max_limit)
             puts "After #{depth}, I'm thinking #{best_node.initial_delta}"
             depth += 1
@@ -152,7 +139,7 @@ class AI < Player
       return nil if children.length == 0
 
       surviving_node = children.max_by do |child|
-        best_node = get_minimax_score(child, search_depth - 1, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
+        best_node = get_minimax_score(child, DEFAULT_SEARCH_DEPTH - 1, GameNode::MIN_SCORE, GameNode::MAX_SCORE)
         best_node.causal_path.length
       end
 

@@ -1,6 +1,6 @@
 class PlayController < ApplicationController
   before_filter :ensure_slug, only: [:ai, :human]
-  before_filter :find_game, only: [:move, :create, :offer_draw, :accept_draw]
+  before_filter :find_game, only: [:move, :create, :offer_draw]
   
   def ai
     @game = Game.find_or_create_by(slug: params[:slug])
@@ -10,10 +10,7 @@ class PlayController < ApplicationController
     end
 
     if @game.new?
-      @game.build_vs_ai(@user.id, params[:depth])
-    elsif params[:depth].present?
-      @game.ai_player.update({search_depth: params[:depth]})
-      @game.ai_player.save
+      @game.build_vs_ai(@user.id)
     end
 
     if @game.is_ai_turn?
@@ -82,7 +79,7 @@ class PlayController < ApplicationController
 
     def ensure_slug
       unless Game.valid_slug?(params[:slug])
-        redirect_to action: action_name, slug: Game.generate_slug, depth: params[:depth]
+        redirect_to action: action_name, slug: Game.generate_slug
       end
     end
 
