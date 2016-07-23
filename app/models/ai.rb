@@ -112,16 +112,23 @@ class AI < Player
 
     def get_iterative_deepening_move(node, time_limit, min_limit, max_limit)
       depth = 1
-      best_node = node.children.first
+      best_node = node.children.sample
 
       begin
         Timeout::timeout(time_limit) do
           while depth <= search_depth do
             best_node = get_minimax_score(node, depth, min_limit, max_limit)
+            puts "After #{depth}, I'm thinking #{best_node.initial_delta}"
             depth += 1
           end
         end
-      ensure
+      rescue Timeout::Error
+        if best_node.losing?(@side)
+          return survival_move(node) 
+        end
+
+        return best_node.initial_delta
+      else
         if best_node.losing?(@side)
           return survival_move(node) 
         end
@@ -174,7 +181,7 @@ class AI < Player
         node.score = min_limit if node.initial_delta.nil?
         best_node = node
 
-        node.children.each do |child|
+        node.order_children(@side).each do |child|
           potential_node = get_minimax_score(child, depth - 1, best_node.score, max_limit)
 
           best_node = potential_node if is_better(potential_node.score, best_node.score)
@@ -194,7 +201,7 @@ class AI < Player
         node.score = max_limit if node.initial_delta.nil?
         worst_node = node
 
-        node.children.each do |child|
+        node.order_children(other_side(@side)).each do |child|
           potential_node = get_minimax_score(child, depth - 1, min_limit, worst_node.score)
 
           worst_node = potential_node if is_worse(potential_node.score, worst_node.score)

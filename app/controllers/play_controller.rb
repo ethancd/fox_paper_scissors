@@ -43,7 +43,7 @@ class PlayController < ApplicationController
     @move.save
 
     if @game.with_ai?
-      FindMove.perform_later(@game)
+      FindMove.perform_now(@game)
     end
 
     render :json => { success: true } #@move.valid? }

@@ -91,10 +91,10 @@ module GameGrammar
   end
 
   def split_pieces(game_position)
-    side = game_position[0]
+    side_initial = game_position[0]
     pieces = game_position.split('')[1..6]
 
-    if side == "r"
+    if side_initial == "r"
       return pieces[0..2], pieces[3..5]
     else
       return pieces[3..5], pieces[0..2]
@@ -190,9 +190,9 @@ module GameGrammar
   def other_side(side)
     case side
       when "red", "r", :red
-        "blue"
+        :blue
       when "blue", "b", :blue
-        "red"
+        :red
     end
   end
 
@@ -215,9 +215,9 @@ module GameGrammar
   def get_side_from_initial(initial)
     case initial
       when "r"
-        "red"
+        :red
       when "b"
-        "blue"
+        :blue
     end
   end
 

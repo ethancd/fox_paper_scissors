@@ -39,6 +39,10 @@ class GameNode
   end
 
   def children
+    @children ||= get_children
+  end
+
+  def get_children
     children = []
 
     get_legal_deltas(@game_position).each do |delta|
@@ -47,7 +51,11 @@ class GameNode
       children << GameNode.new(position, @causal_path + [delta])
     end
 
-    children.sort_by { |child| get_legal_move_count(child.game_position) }
+    children
+  end
+
+  def order_children(side)
+    children.sort_by! { |child| child.simple_score(side) }
   end
 
   def losing?(side)
