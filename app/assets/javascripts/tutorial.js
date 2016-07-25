@@ -1,16 +1,39 @@
 var Tutorial = function(){
   this.initialize = function() {
     this.runTutorial();
+    $(document).on('turbolinks:click', this.endTutorial.bind(this));
   };
 
   this.startingPosition = "ahbyxr"
   this.tickMs = 3000;
   this.gameCounter = 0;
   this.moveCounter = 0;
+  this.timeouts = [];
 
   this.runTutorial = function() {
-    EventsListener.send('tutorial.message', { innerHtml: this.getGameTitle(), tickMs: 0 });
-    setTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
+    this.sendTutorialMessage(this.getGameTitle());
+    this.addTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
+  };
+
+  this.addTimeout = function(callback, tickMs) {
+    var timeoutId = setTimeout(callback, tickMs);
+    this.timeouts.push(timeoutId);
+  };
+
+  this.endTutorial = function() {
+    _.each(this.timeouts, function(id) {
+      clearTimeout(id);
+    });
+
+    this.timeouts = [];
+  };
+
+  this.sendTutorialMessage = function(message, delay) {
+    if (delay) {
+      this.addTimeout(this.sendTutorialMessage.bind(this, message), delay);
+    } else {   
+      EventsListener.send('tutorial.message', { innerHtml: message });
+    }
   };
 
   this.tickTutorial = function () {
@@ -28,7 +51,7 @@ var Tutorial = function(){
       this.resetCounters();
       this.startNewGame();
     } else {
-      setTimeout(this.tickTutorial.bind(this), this.tickMs);
+      this.addTimeout(this.tickTutorial.bind(this), this.tickMs);
     }
   };
 
@@ -42,18 +65,23 @@ var Tutorial = function(){
   };
 
   this.startNewGame = function() {
-    EventsListener.send('tutorial.message', { innerHtml: this.getGameTitle(), tickMs: this.tickMs * 2 });
+    this.sendTutorialMessage(this.getGameTitle(), this.tickMs * 2);
 
-    setTimeout(function() {
+    this.addTimeout(function() {
       EventsListener.send('position.updated', { position: this.startingPosition });
     }.bind(this), this.tickMs * 2);
     
-    setTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
+    this.addTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
   };
 
   this.executeTutorialStep = function(move, message) {
-    EventsListener.send('piece.launched', { delta: move, tickMs: this.tickMs / 3 })
-    EventsListener.send('tutorial.message', { innerHtml: message, tickMs: this.tickMs / 3 });
+    EventsListener.send('piece.highlight', { delta: move })
+
+    this.addTimeout(function() {
+      EventsListener.send('piece.move', { delta: move })
+    }, this.tickMs / 3);
+
+    this.sendTutorialMessage(message, this.tickMs / 3);
   };
 
   this.getGameTitle = function() {
@@ -138,4 +166,4 @@ $(document).on('turbolinks:load', function () {
   if ($('.tutorial-area').length) {
     new Tutorial().initialize();
   }
-})
+});

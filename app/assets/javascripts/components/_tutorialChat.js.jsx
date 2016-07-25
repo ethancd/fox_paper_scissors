@@ -1,37 +1,51 @@
-var TutorialChat = function($el) {
-  this.initialize = function() {
-    this.$el = $el;
-    this.attachHandlers();
-  };
-  
-  this.attachHandlers = function() {
-    EventsListener.listen('tutorial.message', this.publishTutorialMessage.bind(this));
-  };
+var TutorialChat = React.createClass({
+  getInitialState: function() {
+    EventsListener.listen('tutorial.message', this.publishTutorialMessage);
 
-  this.publishTutorialMessage = function(data) {
-    if(!data.text) {
+    return {
+      rawInnerHtmlMessages: []
+    };
+  },
+  render: function() {
+    return (
+      <ul id="tutorial-messages">
+        {this.state.rawInnerHtmlMessages.map(function(message, i){ 
+          return <TutorialMessage content={message} key={i} />
+        })}
+      </ul>
+    );
+  },
+  publishTutorialMessage: function(data) {
+    if(!data.innerHtml) {
       return;
     }
 
-    var messageNode = this.buildTutorialMessage(data.text);
-    setTimeout(this.displayTutorialMessage.bind(this, messageNode), data.tickMs);
-  };
+    this.updateTutorialMessages({content: data.innerHtml});
+  },
+  updateTutorialMessages: function(data) {
+    this.setState({ rawInnerHtmlMessages: this.state.rawInnerHtmlMessages.concat([data.content])});
+  }
+});
 
-  this.buildTutorialMessage = function(text) {
-    var $el = $("<li/>", { class: "message" });
-
-    $el.html(text);
-    return $el;
-  };
-
-  this.displayTutorialMessage = function(messageNode) {
-    this.$el.append(messageNode)
-    this.$el.animate({scrollTop: this.$el.prop("scrollHeight")}, 500)
-  };
-};
-
-$(document).on('turbolinks:load', function () {
-  if ($('.tutorial-messages').length) {
-    new TutorialChat($(".tutorial-messages")).initialize();
+var TutorialMessage = React.createClass({
+  rawMarkup: function () {
+    var rawMarkup = this.props.content;
+    return { __html: this.props.content };
+  },
+  render: function() {
+    return (
+      <li className="message" dangerouslySetInnerHTML={this.rawMarkup()}/>
+    );
+  },
+  componentDidMount: function () {
+    ReactDOM.findDOMNode(this).scrollIntoView();
   }
 })
+
+$(document).on('turbolinks:load', function () {
+  var chatContainer = document.getElementById('tutorial-chat-container');
+
+  if(chatContainer) {
+    ReactDOM.render(<TutorialChat />, chatContainer);
+  }
+});

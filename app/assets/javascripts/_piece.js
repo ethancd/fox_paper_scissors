@@ -25,7 +25,8 @@ var Piece = function(options, $el, board){
     EventsListener.listen("reset", this.resetPiece.bind(this));
     EventsListener.listen("check.threatened", this.checkThreatened.bind(this));
     EventsListener.listen("position.updated", this.checkThreatened.bind(this));
-    EventsListener.listen("piece.launched", this.launchPiece.bind(this));
+    EventsListener.listen("piece.highlight", this.processHighlightRequest.bind(this));
+    EventsListener.listen("piece.move", this.processMoveRequest.bind(this));
 
     this.$el.on('click', function() {
       if (CurrentPlayer && CurrentPlayer.color === this.color) {
@@ -34,16 +35,22 @@ var Piece = function(options, $el, board){
     }.bind(this));
   };
 
-  this.launchPiece = function(data) {
-    var delta = data.delta;
-    var origin = Helpers.getCoordinatesFromLetter(delta[0]);
-    var target = Helpers.getCoordinatesFromLetter(delta[delta.length - 1]);
-
+  this.processHighlightRequest = function(data) {
+    var origin = Helpers.getCoordinatesFromLetter(data.delta[0]);
     if (this.isInSpace(origin)) {
       this.highlight(true);
-      this.delayedMove(target, data.tickMs);
-    } 
-  }
+    }
+  };
+
+  this.processMoveRequest = function(data) {
+    var origin = Helpers.getCoordinatesFromLetter(data.delta[0]);
+    var target = Helpers.getCoordinatesFromLetter(data.delta[data.delta.length - 1]);
+
+    if (this.isInSpace(origin)) {
+      this.movePiece(target);
+      $('.node').removeClass("highlighted");
+    }
+  };
 
   this.highlight = function(skipValidation) {
     if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-marker')) || this.$el.prop("disabled")) {
@@ -101,13 +108,6 @@ var Piece = function(options, $el, board){
     this.movePiece(target)
 
     $.post('/play/move/', data);
-  };
-
-  this.delayedMove = function (target, tick) {
-    setTimeout(function() {
-      this.movePiece(target);
-      $('.node').removeClass("highlighted");
-    }.bind(this), tick);
   };
 
   this.movePiece = function(target) {
