@@ -30,15 +30,15 @@ button.game {
     display: none;
   }
 
-  &.new-game {
+  &[action=new-game] {
     @include button($turquoise);
   }
 
-  &.offer-draw {
+  &[action=offer-draw]{
     @include button($dim-green);
   }
 
-  &.accept-draw {
+  &[action=accept-draw]{
     @include button($bright-bluish-green);
     box-shadow: 0 0 10px $green;
   }

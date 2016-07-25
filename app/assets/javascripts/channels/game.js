@@ -22,7 +22,7 @@ var gameSubscribe = function (slug) {
     draw_offered: function (data) {
       EventsListener.send('chat.message', { text: data.offerer_name + " offers a draw." });
       if(data.offerer_id !== CurrentPlayer.user_id) {
-        EventsListener.send('enable.button', {buttonClass: "accept-draw"});
+        EventsListener.send('enable.button', {action: "accept-draw"});
       }
     },
     draw_accepted: function (data) {
@@ -33,7 +33,7 @@ var gameSubscribe = function (slug) {
       EventsListener.send('chat.message', { text: "dauntless_drone: " + data.message });
     },
     player_swap: function (data) {
-      EventsListener.send('enable.button', {buttonClass: "offer-draw"});
+      EventsListener.send('enable.button', {action: "offer-draw"});
       EventsListener.send('players.swapped');
     }
   });

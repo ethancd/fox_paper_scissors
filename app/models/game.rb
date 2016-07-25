@@ -9,6 +9,12 @@ class Game < ApplicationRecord
 
   COLORS = [:red, :blue]
 
+  enum result: {
+    first_player_win: 0,
+    second_player_win: 1,
+    draw: 2,
+  }
+
   def build_vs_ai(user_id)
     human = Player.new({user_id: user_id})
     ai = AI.new({user_id: AI.id})
@@ -49,6 +55,7 @@ class Game < ApplicationRecord
   end
 
   def wipe_game_history
+    result = nil
     moves.delete_all
     board.reset_board
     players.each { |p| p.draws_considered = [] }
@@ -105,6 +112,7 @@ class Game < ApplicationRecord
 
   def broadcast_checkmate(next_color)
     first_player_won = (next_color == COLORS.last)
+    first_player_won ? first_player_win! : second_player_win!
     winner = Player.find_by({game_id: self.id, first: first_player_won })
 
     ActionCable.server.broadcast "game_#{self.slug}", {
@@ -121,22 +129,26 @@ class Game < ApplicationRecord
     }
   end
 
+  def button
+    @button ||= get_button
+  end
+
+  def get_button
+    GameButton.new("new-game", !complete?)
+  end
+
   def other_color(color)
     COLORS.find { |c| c != color }
   end
 
   def ai_player
-      @ai_player ||= players.find { |player| player.ai? }
+    @ai_player ||= players.find { |player| player.ai? }
   end
 
   def current_player
     first = self.moves.length % 2 == 0
 
     self.players.find_by({first: first})
-  end
-
-  def which_color_turn?
-    COLORS[self.moves.length % 2]
   end
 
   def is_ai_turn?
@@ -156,6 +168,6 @@ class Game < ApplicationRecord
   end
 
   def complete?
-    !!result
+    result.present?
   end
 end

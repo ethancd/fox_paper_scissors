@@ -5,6 +5,6 @@
     <% end %>
   </ul>
   <textarea></textarea>
-  <%= render "shared/game_buttons" %>
+  <%= render partial: "shared/game_buttons", locals: { button: button } %>
   <button class="send">Send</button>
 </div>

@@ -22,7 +22,6 @@ var Piece = function(options, $el, board){
 
   this.attachPieceHandlers = function() {
     EventsListener.listen("node.clicked", this.submitMove.bind(this));
-    EventsListener.listen("reset", this.resetPiece.bind(this));
     EventsListener.listen("check.threatened", this.checkThreatened.bind(this));
     EventsListener.listen("position.updated", this.checkThreatened.bind(this));
     EventsListener.listen("piece.highlight", this.processHighlightRequest.bind(this));
@@ -132,13 +131,6 @@ var Piece = function(options, $el, board){
 
     this.$el.detach();
     $target.append(this.$el);
-  };
-
-  this.resetPiece = function() {
-    //probably throws a bug on pages where player reloads in the middle of the game
-    //original position will be some wacky midgame thing, not startingposition
-    this.position = this.originalPosition;
-    this.moveToPosition();
   };
 
   this.matchesTurnColor = function(piece, tracker) {

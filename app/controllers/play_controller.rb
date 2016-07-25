@@ -1,6 +1,6 @@
 class PlayController < ApplicationController
   before_filter :ensure_slug, only: [:ai, :human]
-  before_filter :find_game, only: [:move, :create, :offer_draw]
+  before_filter :find_game, only: [:move, :create, :offer_draw, :accept_draw]
   
   def ai
     @game = Game.find_or_create_by(slug: params[:slug])
@@ -47,6 +47,7 @@ class PlayController < ApplicationController
   end
 
   def create
+    render nothing: true, status: 400 and return unless @game.complete?
     @game.build_next_game
 
     if @game.is_ai_turn?
@@ -98,6 +99,8 @@ class PlayController < ApplicationController
     end
 
     def broadcast_accept_draw
+      @game.draw!
+
       ActionCable.server.broadcast "game_#{params[:slug]}", {
         action: "draw_accepted"
       }

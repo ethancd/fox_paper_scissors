@@ -46,6 +46,10 @@ var PlayerNames = function(){
     }
   };
 
+  this.vacantSeat = function() {
+    return !!$('.player-name.waiting').length;
+  };
+
   this.playerJoinedGame = function(data) {
     var newPlayer = JSON.parse(data.player);
 
@@ -58,12 +62,11 @@ var PlayerNames = function(){
       return;
     }
 
-    if(data.position) {
+    if(this.vacantSeat()) {
+      this.setPlayerName(newPlayer);
       EventsListener.send('board.initialized', {position: data.position})
+      EventsListener.send('position.updated', {position: data.position, color: "red"})
     }
-
-    this.setPlayerName(newPlayer);
-    EventsListener.send('position.updated', {position: data.position, color: "red"})
   };
 
   this.swapPlayers = function() {

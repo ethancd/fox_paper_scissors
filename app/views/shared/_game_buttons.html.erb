@@ -1,3 +1,5 @@
-<button class="game new-game" disabled>New Game!</button>
-<button class="game offer-draw" disabled>Offer Draw</button>
-<button class="game accept-draw" disabled>Accept Draw</button>
+<% action = button.action unless button.nil? %>
+<% text = button.text unless button.nil? %>
+<% disabled = button.present? ? button.disabled : true %>
+
+<button class="game" action="<%= action %>" <%= "disabled" if disabled %> > <%= text %> </button>
