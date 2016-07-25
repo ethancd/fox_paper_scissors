@@ -4,7 +4,7 @@
 $pointing-up: true;
 $pointing-down: false;
 
-.turn-tracker {
+#turn-tracker {
   position: relative;
   z-index: 1;
   width: 123px;
@@ -22,7 +22,7 @@ $pointing-down: false;
     height: 0; 
     margin: auto;
 
-    &.red {
+    &[color=red] {
       @include triangle($red, 50px, $pointing-up);
       top: 50px;
 
@@ -33,7 +33,7 @@ $pointing-down: false;
       }
     }
 
-    &.blue {
+    &[color=blue] {
       @include triangle($blue, 50px, $pointing-down);
       bottom: 50px;
 

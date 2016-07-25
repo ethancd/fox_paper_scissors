@@ -73,9 +73,3 @@ var GameButton = function($el){
     this.$el.prop("disabled", !enabled);
   };
 };
-
-$(document).on('turbolinks:load', function() {
-  if($('button.game').length) {
-    new GameButton($('button.game')).initialize();
-  }
-});

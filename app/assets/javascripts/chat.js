@@ -51,10 +51,3 @@ var Chat = function($el) {
     return $message;
   };
 };
-
-
-$(document).on('turbolinks:load', function() {
-  if ($('.chat').length) {
-    new Chat($('.chat')).initialize();
-  }
-});

@@ -52,7 +52,7 @@ var Piece = function(options, $el, board){
   };
 
   this.highlight = function(skipValidation) {
-    if (!skipValidation && !this.matchesTurnColor(this.$el, $('.turn-marker')) || this.$el.prop("disabled")) {
+    if (!skipValidation && !this.matchesTurnColor() || this.$el.prop("disabled")) {
       return;
     }
 
@@ -64,6 +64,10 @@ var Piece = function(options, $el, board){
       var legalNodes = this.getLegalNodes();
       EventsListener.send("piece.clicked", { nodes: legalNodes });
     }
+  };
+
+  this.matchesTurnColor = function() {
+    return this.color === this.board.turnColor();
   };
 
   this.getLegalNodes = function() {
@@ -131,12 +135,6 @@ var Piece = function(options, $el, board){
 
     this.$el.detach();
     $target.append(this.$el);
-  };
-
-  this.matchesTurnColor = function(piece, tracker) {
-    return _.some(["red", "blue"], function(color) {
-      return piece.hasClass(color) && tracker.hasClass(color);
-    });
   };
 
   this.isMobile = function () {

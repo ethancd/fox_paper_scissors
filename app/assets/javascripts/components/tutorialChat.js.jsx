@@ -1,10 +1,6 @@
 var TutorialChat = React.createClass({
   getInitialState: function() {
-    EventsListener.listen('tutorial.message', this.publishTutorialMessage);
-
-    return {
-      rawInnerHtmlMessages: []
-    };
+    return { rawInnerHtmlMessages: [] };
   },
   render: function() {
     return (
@@ -14,6 +10,9 @@ var TutorialChat = React.createClass({
         })}
       </ul>
     );
+  },
+  componentDidMount: function() {
+    EventsListener.listen('tutorial.message', this.publishTutorialMessage);
   },
   publishTutorialMessage: function(data) {
     if(!data.innerHtml) {
@@ -39,13 +38,5 @@ var TutorialMessage = React.createClass({
   },
   componentDidMount: function () {
     ReactDOM.findDOMNode(this).scrollIntoView();
-  }
-})
-
-$(document).on('turbolinks:load', function () {
-  var chatContainer = document.getElementById('tutorial-chat-container');
-
-  if(chatContainer) {
-    ReactDOM.render(<TutorialChat />, chatContainer);
   }
 });

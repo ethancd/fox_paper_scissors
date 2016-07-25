@@ -1,6 +1,7 @@
-var Board = function($el){
+var Board = function($el, turnMarker){
   this.initialize = function() {
     this.$el = $el;
+    this.turnMarker = turnMarker;
     this.attachHandlers();
 
     if(StartingPosition) {
@@ -39,6 +40,14 @@ var Board = function($el){
         i++;
       }.bind(this));
     }.bind(this));
+  };
+
+  this.turnColor = function () {
+    if (!this.turnMarker) {
+      return;
+    }
+
+    return this.turnMarker.state.color;
   };
 
   this.getThreatenedPieces = function (activeColor) {
@@ -99,9 +108,3 @@ var Board = function($el){
     $target.append($piece);
   };
 };
-
-$(document).on('turbolinks:load', function() {
-  if($('.board').length) {
-    new Board($('.board')).initialize();
-  }
-})

@@ -9,7 +9,7 @@ $blue-shadow-color: darken($med-bright-blue, 25%);
   height: 450px;
   margin: 10px auto;
 
-  .turn-tracker, .board, .chat {
+  #turn-tracker, .board, .chat {
     float: left;
     margin-left: 25px;
 

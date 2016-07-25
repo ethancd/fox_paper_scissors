@@ -82,7 +82,3 @@ var PlayerNames = function(){
     $(".player-name.blue").text(redName).attr("data-content", redWins);
   };
 };
-
-$(document).on('turbolinks:load', function() {
-  new PlayerNames().initialize();
-})

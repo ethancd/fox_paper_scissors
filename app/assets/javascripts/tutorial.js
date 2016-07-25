@@ -161,9 +161,3 @@ var Tutorial = function(){
     this.longMirrorOpeningRedWin
   ];
 };
-
-$(document).on('turbolinks:load', function () {
-  if ($('.tutorial-area').length) {
-    new Tutorial().initialize();
-  }
-});
