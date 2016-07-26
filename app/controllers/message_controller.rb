@@ -1,7 +1,6 @@
 class MessageController < ApplicationController
 
   def create
-    params.inspect
     @message = Message.create(message_params)
 
     ActionCable.server.broadcast("chat_#{params[:chat_id]}", {

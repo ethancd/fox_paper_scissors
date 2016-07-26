@@ -1,7 +1,7 @@
 @import 'colors';
 @import 'mixins';
 
-.chat {
+#chat-container  {
   width: 223px;
   height: 450px;
   border: 1px solid $black;
@@ -10,7 +10,7 @@
   background-color: $very-transparent-black;
   font-size: 16px;
 
-  .messages {
+  #messages {
     height: 360px;
     margin: 2px;
     border-radius: 15px 15px 0 0;
@@ -23,6 +23,7 @@
       margin: 5px auto;
       color: $very-dark-gray;
       word-wrap: break-word;
+      white-space: pre-wrap;
     }
   }
 

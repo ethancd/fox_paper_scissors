@@ -78,14 +78,13 @@ module NameGenerator
         "polite",
         "powerful",
         "practical",
-        "pro-active",
+        "proactive",
         "quick-witted",
         "quiet",
         "rational",
         "reliable",
         "reserved",
         "resourceful",
-        "romantic",
         "self-confident",
         "self-disciplined",
         "sensible",
@@ -102,7 +101,6 @@ module NameGenerator
         "understanding",
         "versatile",
         "warmhearted",
-        "willing",
         "witty"
       ]
     end

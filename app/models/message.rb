@@ -15,6 +15,13 @@ class Message < ApplicationRecord
     end
   end
 
+  def as_json(options = {})
+    result = super(options)
+    result[:text] = get_formatted_text
+    result[:color] = get_color
+    result
+  end
+
     private
       def text_colors
         {

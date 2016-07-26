@@ -1,7 +1,7 @@
 var chatSubscribe = function($el) {
   App.chat = App.cable.subscriptions.create({
       channel: "ChatChannel",
-      chat_id: $el.attr('id')
+      chat_id: $el.attr('data-chat-id')
     }, {
     received: function(data) {
       if(this.hasOwnProperty(data.action)) {
@@ -12,11 +12,7 @@ var chatSubscribe = function($el) {
       EventsListener.send('chat.message', { text: data.text + " has joined the room." });
     },
     new_message: function(data) {
-      EventsListener.send('chat.message', { text: data.text, color: data.color });
+      EventsListener.send('chat.message', data);
     }
   });
 }
-
-$(document).on('turbolinks:load', function() {
-  chatSubscribe($('.chat'));
-});

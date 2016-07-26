@@ -38,10 +38,3 @@ var gameSubscribe = function (slug) {
     }
   });
 }
-
-$(document).on('turbolinks:load', function() {
-  var slug = Helpers.getSlug();
-  if (slug) {
-    gameSubscribe(slug);
-  }
-});

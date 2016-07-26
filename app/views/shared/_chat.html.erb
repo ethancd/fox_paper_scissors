@@ -1,10 +1,5 @@
-<div class="chat" id="<%= chat.id %>">
-  <ul class="messages">
-    <% chat.messages.each do |message| %>
-      <li class="message"><%= "#{message.author.name}: #{message.text}" %></li>
-    <% end %>
-  </ul>
-  <textarea></textarea>
-  <div id="game-button-container" data-initial-action="<%= button.action %>"></div>
-  <button class="send">Send</button>
+<div id="chat-container" 
+  data-chat-id="<%= chat.id %>" 
+  data-initial-messages="<%= chat.messages.to_json %>" 
+  data-initial-button-action="<%= button.action %>">
 </div>
