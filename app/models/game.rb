@@ -55,7 +55,7 @@ class Game < ApplicationRecord
   end
 
   def wipe_game_history
-    result = nil
+    update({result: nil})
     moves.delete_all
     board.reset_board
     players.each { |p| p.draws_considered = [] }

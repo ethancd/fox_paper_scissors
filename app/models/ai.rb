@@ -116,7 +116,7 @@ class AI < Player
       #not ensure, since that swallows non-Timeout errors
     end
 
-    def get(best_node, node)
+    def get_best_looking_move(best_node, node)
       best_node.losing?(@side) ? survival_move(node) : best_node.initial_delta
     end
 
