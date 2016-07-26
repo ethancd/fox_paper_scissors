@@ -16,11 +16,11 @@ var ChatForm = React.createClass({
   },
   sendMessageIfEnter: function (event) {
     if(event.key == "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      this.sendMessage();
+      this.sendMessage(event);
     }
   },
-  sendMessage: function () {
+  sendMessage: function (event) {
+    event.preventDefault();
     if (!this.state.value.trim()) {
       return;
     }

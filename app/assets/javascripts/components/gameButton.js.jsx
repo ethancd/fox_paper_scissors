@@ -14,7 +14,8 @@ var GameButton = React.createClass({
     EventsListener.listen("game.over", this.setButtonAction.bind(this, {action: "new-game"}));
     EventsListener.listen("position.updated", this.setButtonAction.bind(this, {action: "offer-draw"}));
   },
-  activateButton: function() {
+  activateButton: function(event) {
+    event.preventDefault();
     $.post(this.buttonUrl[this.state.action], {slug: Helpers.getSlug()});
     this.setButtonAction({action: "none"});
   },
