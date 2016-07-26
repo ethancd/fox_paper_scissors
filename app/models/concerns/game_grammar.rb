@@ -149,33 +149,15 @@ module GameGrammar
   end
 
   def get_ordered_coords
-    [
-      [0,0],
-      [2,0],
-      [4,0],
-      [6,0],
-      [1,1],
-      [3,1],
-      [5,1],
-      [0,2],
-      [2,2],
-      [4,2],
-      [6,2],
-      [1,3],
-      [3,3],
-      [5,3],
-      [0,4],
-      [2,4],
-      [4,4],
-      [6,4],
-      [1,5],
-      [3,5],
-      [5,5],
-      [0,6],
-      [2,6],
-      [4,6],
-      [6,6]
-    ]
+    coordinates_list = []
+
+    7.times do |i|
+      7.times do |j|
+        coordinates_list.push([j,i]) if i%2 == j%2
+      end
+    end
+
+    coordinates_list
   end
 
   def other_initial(initial)
