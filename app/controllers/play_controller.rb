@@ -43,7 +43,7 @@ class PlayController < ApplicationController
       FindMove.perform_now(@game)
     end
 
-    render :json => { success: true } #@move.valid? }
+    render :json => { success: true }
   end
 
   def create
