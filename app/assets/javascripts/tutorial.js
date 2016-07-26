@@ -4,7 +4,6 @@ var Tutorial = function(){
     $(document).on('turbolinks:click', this.endTutorial.bind(this));
   };
 
-  this.startingPosition = "ahbyxr"
   this.tickMs = 3000;
   this.gameCounter = 0;
   this.moveCounter = 0;
@@ -68,7 +67,7 @@ var Tutorial = function(){
     this.sendTutorialMessage(this.getGameTitle(), this.tickMs * 2);
 
     this.addTimeout(function() {
-      EventsListener.send('position.updated', { position: this.startingPosition });
+      EventsListener.send('position.updated', { position: StartingPosition });
     }.bind(this), this.tickMs * 2);
     
     this.addTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
