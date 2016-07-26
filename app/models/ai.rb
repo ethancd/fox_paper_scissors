@@ -105,23 +105,19 @@ class AI < Player
         Timeout::timeout(time_limit) do
           while depth <= DEFAULT_SEARCH_DEPTH do
             best_node = get_minimax_score(node, depth, min_limit, max_limit)
-            puts "After #{depth}, I'm thinking #{best_node.initial_delta}"
             depth += 1
           end
         end
       rescue Timeout::Error
-        if best_node.losing?(@side)
-          return survival_move(node) 
-        end
-
-        return best_node.initial_delta
+        return get_best_looking_move(best_node, node)
       else
-        if best_node.losing?(@side)
-          return survival_move(node) 
-        end
-
-        return best_node.initial_delta
+        return get_best_looking_move(best_node, node)
       end 
+      #not ensure, since that swallows non-Timeout errors
+    end
+
+    def get(best_node, node)
+      best_node.losing?(@side) ? survival_move(node) : best_node.initial_delta
     end
 
     def get_minimax_move(node, depth, min_limit, max_limit)
