@@ -167,4 +167,8 @@ class Game < ApplicationRecord
   def complete?
     result.present?
   end
+
+  def result
+    @result ||= self[:result]
+  end
 end
