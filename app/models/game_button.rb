@@ -1,4 +1,4 @@
-GameButton = Struct.new(:action, :disabled) do 
+GameButton = Struct.new(:action) do 
   ButtonTexts = {
     "new-game" => "New Game!",
     "offer-draw" => "Offer Draw",

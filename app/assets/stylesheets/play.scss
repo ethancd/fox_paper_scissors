@@ -26,7 +26,7 @@ button.game {
   margin-left: 5px;
   text-align: center;
 
-  &:disabled {
+  &[action=none] {
     display: none;
   }
 
@@ -57,17 +57,17 @@ button.game {
     content: attr(data-content)
   }
 
-  &.red {
+  &[data-side=red] {
     color: $med-bright-red;
     @include text_stroke($red-shadow-color);
   }
 
-  &.blue {
+  &[data-side=blue] {
     color: $med-bright-blue;
     @include text_stroke($blue-shadow-color);
   }
 
-  &.gray {
+  &[data-side=vacant] {
     color: $very-dark-gray;
     @include text_stroke($black);
   }

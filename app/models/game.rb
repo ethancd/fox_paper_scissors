@@ -130,11 +130,8 @@ class Game < ApplicationRecord
   end
 
   def button
-    @button ||= get_button
-  end
-
-  def get_button
-    GameButton.new("new-game", !complete?)
+    action = complete? ? "new-game" : "none"
+    GameButton.new(action)
   end
 
   def other_color(color)

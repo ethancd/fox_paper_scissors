@@ -1,13 +1,12 @@
-<%= render partial: "shared/player_name", locals: { player: @game.first_player, user: @user } %>
+<div id="first-player-container" data-initial-name="<%= @game.first_player.try(:user_name) %>"></div>
 
 <div class="play-area">
-  <%= render partial: "shared/turn_tracker", locals: { player: @game.current_player } %>
+  <div id="turn-tracker" data-initial-color="<%= @game.current_player.try(:color) %>"></div>
   <%= render partial: "shared/board", locals: { board: @game.board } %>
   <%= render partial: "shared/chat", locals: { chat: @game.chat, button: @game.button } %>
 </div>
 
-<%= render partial: "shared/player_name", locals:  { player: @game.second_player, user: @user } %>
-
+<div id="second-player-container" data-initial-name="<%= @game.second_player.try(:user_name) %>"></div>
 
 <div class="play-image"></div>
 
