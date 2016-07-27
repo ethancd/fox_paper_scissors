@@ -1,35 +1,20 @@
 var Tutorial = function(){
   this.initialize = function() {
     this.runTutorial();
-    $(document).on('turbolinks:click', this.endTutorial.bind(this));
   };
 
   this.tickMs = 3000;
   this.gameCounter = 0;
   this.moveCounter = 0;
-  this.timeouts = [];
 
   this.runTutorial = function() {
     this.sendTutorialMessage(this.getGameTitle());
-    this.addTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
+    setTimeout(this.tickTutorial.bind(this), this.tickMs / 2)
   };
-
-  this.addTimeout = function(callback, tickMs) {
-    var timeoutId = setTimeout(callback, tickMs);
-    this.timeouts.push(timeoutId);
-  };
-
-  this.endTutorial = function() {
-    _.each(this.timeouts, function(id) {
-      clearTimeout(id);
-    });
-
-    this.timeouts = [];
-  };
-
+  
   this.sendTutorialMessage = function(message, delay) {
     if (delay) {
-      this.addTimeout(this.sendTutorialMessage.bind(this, message), delay);
+      setTimeout(this.sendTutorialMessage.bind(this, message), delay);
     } else {   
       EventsListener.send('tutorial.message', { innerHtml: message });
     }
@@ -50,7 +35,7 @@ var Tutorial = function(){
       this.resetCounters();
       this.startNewGame();
     } else {
-      this.addTimeout(this.tickTutorial.bind(this), this.tickMs);
+      setTimeout(this.tickTutorial.bind(this), this.tickMs);
     }
   };
 
@@ -66,17 +51,17 @@ var Tutorial = function(){
   this.startNewGame = function() {
     this.sendTutorialMessage(this.getGameTitle(), this.tickMs * 2);
 
-    this.addTimeout(function() {
+    setTimeout(function() {
       EventsListener.send('position.updated', { position: StartingPosition });
     }.bind(this), this.tickMs * 2);
     
-    this.addTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
+    setTimeout(this.tickTutorial.bind(this), this.tickMs * 3);
   };
 
   this.executeTutorialStep = function(move, message) {
     EventsListener.send('piece.highlight', { delta: move })
 
-    this.addTimeout(function() {
+    setTimeout(function() {
       EventsListener.send('piece.move', { delta: move })
     }, this.tickMs / 3);
 

@@ -56,6 +56,6 @@ var Initializer = function() {
   }
 };
 
-$(document).on('turbolinks:load', function() {
+$(document).on('ready', function() {
   new Initializer().initialize();
 });
