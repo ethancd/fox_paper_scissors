@@ -23,7 +23,7 @@ var PlayerName = React.createClass({
     return this.state.userName.match("dauntless_drone"); //what a hack
   },
   getName: function() {
-    return this.state.userName || "waiting...";
+    return this.state.userName || "waiting";
   },
   getSide: function() {
     return this.isVacant() ? "vacant" : this.props.color;
