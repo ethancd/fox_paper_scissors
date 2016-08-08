@@ -74,7 +74,6 @@ $brightish-blue-border: darken($brightish-blue, 10%);
   overflow: auto;
 
   .message {
-    box-sizing: content-box;
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
     color: $black;
