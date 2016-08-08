@@ -71,10 +71,11 @@ $brightish-blue-border: darken($brightish-blue, 10%);
   background-color: $very-transparent-white;
   font-size: 16px;
   font-family: 'Open Sans', sans-serif;
-  overflow: scroll;
+  overflow: auto;
 
   .message {
-    width: 270px;
+    box-sizing: content-box;
+    width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
     color: $black;
 
