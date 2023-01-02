@@ -1,8 +1,7 @@
 # Fox Paper Scissors
 
-[Fox Paper Scissors][heroku] is an original game that combines the [non-transitivity][transitivity] of Rock Paper Scissors with the chasing mechanics of traditional [fox games][fox games].
+Fox Paper Scissors is an original game that combines the [non-transitivity][transitivity] of Rock Paper Scissors with the chasing mechanics of traditional [fox games][fox games].
 
-[heroku]: http://fox-paper-scissors.herokuapp.com
 [transitivity]: https://en.wikipedia.org/wiki/Nontransitive_game
 [fox games]: https://en.wikipedia.org/wiki/Fox_games
 
